@@ -86,7 +86,8 @@ kubernetes-escape-room/
     │   └── plan.md                  # Architecture & implementation plan
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
-    │   └── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup
+    │   ├── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup
+    │   └── 02-milestone-02.md       # Session 2 log: Level 01 — The Ghost Image
     ├── ai-prompts-cheatsheet.md
     └── pre-workshop-checklist.md
 ```

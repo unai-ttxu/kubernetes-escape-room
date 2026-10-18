@@ -53,7 +53,7 @@ M1: Core Harness & Cluster Setup
 
 ## Milestone 2 — Level 01: "The Ghost Image" (Warm-up)
 
-**Status:** ⏳ Ready to start  
+**Status:** ✅ Complete  
 **Namespace:** `escape-level-01`  
 **Duration target:** 8–10 min
 
@@ -76,11 +76,11 @@ scenarios/level-01-ghost-image/
 3. `verify.sh` exits `0` on pass, `1` on fail
 
 **Review checklist (human must approve before M5 starts):**
-- [ ] `broken/` manifests reproducibly cause `ImagePullBackOff`
-- [ ] `solution/` applies cleanly and brings pod to `Running`
-- [ ] `hints.md` has all 3 tiers (Conceptual → kubectl → AI Prompt)
-- [ ] `verify.sh` runs idempotently from inside the cluster
-- [ ] `incident.md` reads like a real pager alert
+- [x] `broken/` manifests reproducibly cause `ImagePullBackOff`
+- [x] `solution/` applies cleanly and brings pod to `Running`
+- [x] `hints.md` has all 3 tiers (Conceptual → kubectl → AI Prompt)
+- [x] `verify.sh` runs idempotently from inside the cluster
+- [x] `incident.md` reads like a real pager alert
 
 ---
 
