@@ -155,7 +155,7 @@ COMPLETED_LEVELS=
 
 ### 📋 Milestone 2: Implement Level 01 ("The Ghost Image")
 > **Prompt for Agent 2:**
-> *"Create Level 01 under `scenarios/level-01-ghost-image/`. Structure: `broken/` (manifest with non-existent image tag `nginx:1.27.99-alpine` in namespace `escape-level-01`), `solution/` (valid `nginx:alpine`), `incident.md` (realistic PagerDuty alert), `hints.md` (3-tier hints + AI prompt recipe), and `verify.sh` (deterministic probe testing Pod readiness and HTTP 200). Ensure `verify.sh` exits 0 on success, 1 on failure."*
+> *"Create Level 01 under `scenarios/level-01-ghost-image/`. Structure: `broken/` (manifest with non-existent image tag `nginx:1.27.99-alpine` in namespace `escape-level-01`), `solution/` (valid `nginx:1.27-alpine`), `incident.md` (realistic PagerDuty alert), `hints.md` (3-tier hints + AI prompt recipe), and `verify.sh` (deterministic probe testing Pod readiness and HTTP 200). Ensure `verify.sh` exits 0 on success, 1 on failure."*
 
 ### 📋 Milestone 3: Implement Level 02 ("The Crashing Config")
 > **Prompt for Agent 3:**

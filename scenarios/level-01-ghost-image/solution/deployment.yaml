@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: payment-gateway
-          image: nginx:alpine
+          image: nginx:1.27-alpine
           ports:
             - containerPort: 80
               name: http

@@ -15,9 +15,8 @@ All incoming checkout payment transactions are failing with `503 Service Unavail
 
 ### Telemetry & Impact
 - **Endpoint Health:** 0/1 pods ready
-- **Error Rate:** 100% on `/api/v1/checkout`
+- **Error Rate:** 100% of requests failing
 - **Customer Impact:** Global payment processing halted
-- **Last Action:** Automated CI/CD deployment completed 3 minutes ago
 
 ### Triage Runbook
 1. Inspect deployment and pod health in namespace `escape-level-01`:
@@ -25,6 +24,6 @@ All incoming checkout payment transactions are failing with `503 Service Unavail
    kubectl get pods -n escape-level-01
    kubectl describe pod -n escape-level-01 -l app=payment-gateway
    ```
-2. Diagnose why the container runtime fails to start the workload.
+2. Diagnose why the workload is not becoming ready.
 3. Apply the corrective configuration change to restore endpoint availability.
 4. Verify resolution using `./scripts/escape-room.sh verify`.

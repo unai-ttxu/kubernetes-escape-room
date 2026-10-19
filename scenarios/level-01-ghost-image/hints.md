@@ -23,12 +23,7 @@ Look closely at the **Events** section at the bottom of the output:
   ```bash
   kubectl get deployment payment-gateway -n escape-level-01 -o yaml | grep image:
   ```
-- To fix the issue, you can update the deployment's image to a valid tag
-  (such as `nginx:alpine`):
-  ```bash
-  kubectl set image deployment/payment-gateway payment-gateway=nginx:alpine -n escape-level-01
-  ```
-  *(Or edit the manifest directly and apply with `kubectl apply -f <manifest>`)*
+- Compare that string with the tags actually published for the image on its registry.
 
 ## Hint 3: AI Copilot Prompt Recipe
 Use the **SRE Copilot Prompt Pattern** (Context + Symptom + kubectl output + Goal)

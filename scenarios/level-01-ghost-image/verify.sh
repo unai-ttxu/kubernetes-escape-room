@@ -5,33 +5,31 @@ readonly NAMESPACE="escape-level-01"
 readonly APP_LABEL="app=payment-gateway"
 readonly SERVICE_URL="http://payment-gateway.${NAMESPACE}.svc.cluster.local:80/"
 readonly PROBE_POD="verify-probe-$$"
-
-# shellcheck disable=SC2329
-cleanup() {
-  kubectl delete pod "${PROBE_POD}" -n "${NAMESPACE}" --ignore-not-found=true --wait=false > /dev/null 2>&1 || true
-}
-trap cleanup EXIT
+readonly PROBE_IMAGE="curlimages/curl:8.11.1"
 
 echo "🔍 Verifying Level 01..."
 
-# Step 1: Check pod readiness
-READY=$(kubectl get pods -n "${NAMESPACE}" -l "${APP_LABEL}" \
-  -o jsonpath='{.items[0].status.containerStatuses[0].ready}' 2>/dev/null || echo "false")
-
-if [[ "${READY}" != "true" ]]; then
-  echo "❌ Pod is not ready. Run: kubectl get pods -n ${NAMESPACE}"
+# Step 1: Check the rollout is complete (new pods Ready, old pods gone)
+if ! kubectl rollout status deployment/payment-gateway -n "${NAMESPACE}" --timeout=5s > /dev/null 2>&1; then
+  echo "❌ Pod is not ready. Run: kubectl get pods -n ${NAMESPACE} -l ${APP_LABEL}"
   exit 1
 fi
 
 # Step 2: In-cluster HTTP probe
-if ! kubectl run "${PROBE_POD}" \
-  --image=curlimages/curl:latest \
+PROBE_OUT=""
+if ! PROBE_OUT=$(kubectl run "${PROBE_POD}" \
+  --image="${PROBE_IMAGE}" \
   --restart=Never \
   --rm \
   -i \
+  --pod-running-timeout=60s \
   -n "${NAMESPACE}" \
-  -- curl -fsS --max-time 5 "${SERVICE_URL}" > /dev/null 2>&1; then
-  echo "❌ Endpoint probe failed: service at ${SERVICE_URL} did not return HTTP 200"
+  -- curl -fsS --max-time 5 "${SERVICE_URL}" 2>&1 > /dev/null); then
+  if [[ "${PROBE_OUT}" == *"curl: ("* ]]; then
+    echo "❌ Endpoint probe failed: service at ${SERVICE_URL} did not return HTTP 200"
+  else
+    echo "⚠️  Could not run the probe pod (image pull or scheduling issue). Retry in a moment."
+  fi
   exit 1
 fi
 

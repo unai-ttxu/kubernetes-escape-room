@@ -1,7 +1,7 @@
 # Session 02 — Milestone 2: Level 01: "The Ghost Image"
 
 > **Date:** 2026-10-18  
-> **Status:** ✅ Completed  
+> **Status:** 🔍 In review  
 > **Branch:** `feat/M2`  
 
 ---
@@ -18,7 +18,7 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 |---|---|
 | [`scenarios/level-01-ghost-image/broken/deployment.yaml`](../../scenarios/level-01-ghost-image/broken/deployment.yaml) | Deployment manifest specifying non-existent tag `nginx:1.27.99-alpine` |
 | [`scenarios/level-01-ghost-image/broken/service.yaml`](../../scenarios/level-01-ghost-image/broken/service.yaml) | ClusterIP Service routing port 80 to backend pods |
-| [`scenarios/level-01-ghost-image/solution/deployment.yaml`](../../scenarios/level-01-ghost-image/solution/deployment.yaml) | Reference fix Deployment with valid `nginx:alpine` image |
+| [`scenarios/level-01-ghost-image/solution/deployment.yaml`](../../scenarios/level-01-ghost-image/solution/deployment.yaml) | Reference fix Deployment with valid `nginx:1.27-alpine` image |
 | [`scenarios/level-01-ghost-image/solution/service.yaml`](../../scenarios/level-01-ghost-image/solution/service.yaml) | Reference Service matching the deployment |
 | [`scenarios/level-01-ghost-image/incident.md`](../../scenarios/level-01-ghost-image/incident.md) | Realistic PagerDuty alert (`#INC-8021`) reporting 0 healthy endpoints |
 | [`scenarios/level-01-ghost-image/hints.md`](../../scenarios/level-01-ghost-image/hints.md) | 3-tier progressive hints + AI copilot SRE prompt recipe |
@@ -29,9 +29,9 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 ## 💡 Key Design Decisions & Iterations
 
 1. **Deterministic & Quiet In-Cluster Probing**:
-   - `verify.sh` first checks pod readiness via `jsonpath='{.items[0].status.containerStatuses[0].ready}'`.
-   - Executes an in-cluster ephemeral probe (`curlimages/curl:latest`) against `http://payment-gateway.escape-level-01.svc.cluster.local:80/`.
-   - Output and stderr redirected cleanly with probe cleanup trap (`trap cleanup EXIT`) to prevent lingering probe pods and suppress terminal noise during automated checks.
+   - `verify.sh` first checks rollout completion via `kubectl rollout status deployment/payment-gateway`, so stale pods from a previous ReplicaSet cannot cause false results.
+   - Executes an in-cluster ephemeral probe (pinned `curlimages/curl:8.11.1`) against `http://payment-gateway.escape-level-01.svc.cluster.local:80/`.
+   - Probe stderr is captured to tell endpoint failures apart from probe-pod failures (image pull or scheduling).
    - Idempotent and strictly exits `0` on success, `1` on failure.
 
 2. **Strict Convention Adherence**:
@@ -41,20 +41,22 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 
 3. **Progressive AI Pedagogy**:
    - Hint 1 provides the conceptual mechanism (container runtime image pull).
-   - Hint 2 provides exact `kubectl describe pod` and events triage commands.
+   - Hint 2 provides `kubectl describe pod` and events triage commands without revealing the fix.
    - Hint 3 provides a reusable SRE Copilot Prompt Pattern (Context + Symptom + kubectl output + Goal) for free AI assistants.
 
 ---
 
 ## ✅ Verification & Smoke Test Lifecycle
 
-- [x] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings.
-- [x] **Broken State**: `./scripts/escape-room.sh start level-01` injected broken manifests; pods reliably entered `ImagePullBackOff`.
-- [x] **Verification Failure**: `./scripts/escape-room.sh verify` exited with code `1` while broken.
-- [x] **Hint Parsing**: `./scripts/escape-room.sh hint` properly parsed and rendered Hints 1, 2, and 3 sequentially, warning on 4th invocation.
-- [x] **Solution Rollout**: `./scripts/escape-room.sh solve` applied reference fix; deployment rolled out cleanly to `Running 1/1`.
-- [x] **Verification Success**: `./scripts/escape-room.sh verify` passed with code `0` and rendered the celebration banner.
-- [x] **Reset Idempotency**: `./scripts/escape-room.sh reset` restored broken state; subsequent verify failed as expected.
+> Pending: re-run the full smoke test after the review fixes and tick the items below.
+
+- [ ] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings.
+- [ ] **Broken State**: `./scripts/escape-room.sh start level-01` injected broken manifests; pods reliably entered `ImagePullBackOff`.
+- [ ] **Verification Failure**: `./scripts/escape-room.sh verify` exited with code `1` while broken.
+- [ ] **Hint Parsing**: `./scripts/escape-room.sh hint` properly parsed and rendered Hints 1, 2, and 3 sequentially, warning on 4th invocation.
+- [ ] **Solution Rollout**: `./scripts/escape-room.sh solve` applied reference fix; deployment rolled out cleanly to `Running 1/1`.
+- [ ] **Verification Success**: `./scripts/escape-room.sh verify` passed with code `0` and rendered the celebration banner.
+- [ ] **Reset Idempotency**: `./scripts/escape-room.sh reset` restored broken state; subsequent verify failed as expected.
 
 ---
 
