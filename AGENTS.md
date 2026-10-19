@@ -130,6 +130,7 @@ kubectl version        # >= 1.28
 ./scripts/escape-room.sh hint
 
 # Verify the scenario is fixed
+# (on success, prints next steps: start the next level, reset, or cleanup)
 ./scripts/escape-room.sh verify
 
 # Apply the reference solution (instructor use only)

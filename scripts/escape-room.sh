@@ -112,6 +112,37 @@ unmark_completed() {
   write_state "COMPLETED_LEVELS" "${kept}"
 }
 
+# Prints the next available level after "$1" (empty if none has a scenario yet)
+next_level() {
+  local current="$1" found=0 candidate d
+  for candidate in ${VALID_LEVELS}; do
+    if [[ "${found}" -eq 1 ]]; then
+      for d in "${SCENARIOS_DIR}/${candidate}-"*/; do
+        if [[ -d "${d}" ]]; then
+          echo "${candidate}"
+          return 0
+        fi
+      done
+    fi
+    [[ "${candidate}" == "${current}" ]] && found=1
+  done
+  return 0
+}
+
+print_next_steps() {
+  local level="$1" next
+  next="$(next_level "${level}")"
+  echo -e "${BOLD}What's next?${NC}"
+  if [[ -n "${next}" ]]; then
+    echo -e "  Continue:   ${BOLD}./scripts/escape-room.sh start ${next}${NC}"
+  else
+    echo -e "  ${GREEN}No more levels available — you cleared them all!${NC}"
+  fi
+  echo -e "  Retry:      ${BOLD}./scripts/escape-room.sh reset${NC}"
+  echo -e "  Tear down:  ${BOLD}./scripts/escape-room.sh cleanup${NC}"
+  echo ""
+}
+
 # ─── Prerequisite checks ──────────────────────────────────────────────────────
 
 install_hint() {
@@ -417,6 +448,7 @@ cmd_verify() {
       fi
     fi
     print_success_banner
+    print_next_steps "${level}"
   else
     echo ""
     echo -e "${YELLOW}⚠  Not fixed yet. Run ${BOLD}./scripts/escape-room.sh hint${NC}${YELLOW} for your next clue.${NC}"
