@@ -272,6 +272,7 @@ exit 0
 
 - `setup` checks `docker`, `kind` and `kubectl`; for a missing `docker` or `kind` it prints an install link/hint and exits `1`. A stopped Docker daemon gets a "start Docker Desktop" hint.
 - `start <level>` and `reset` re-break the level **and** remove it from `COMPLETED_LEVELS` in `.room-state`, so `status` never shows a broken level as completed. Only `cleanup` deletes `.room-state`.
+- `start <level>` first deletes the namespaces of all other levels (completed marks in `.room-state` are kept), so a previous level never interferes with the new one.
 - `start <level>` builds `scenarios/<level>-*/app/` when it contains a `Dockerfile` and loads the image into the kind cluster (`escape-room/<level>-app:1.0.0`, e.g. `escape-room/level-02-app:1.0.0`), so no external registry is needed. Manifests reference that tag with `imagePullPolicy: IfNotPresent`. `reset` reuses the loaded image.
 - `verify` success appends the level to `COMPLETED_LEVELS` (exact match, no substring grep) and prints a "What's next?" block (`start <next-level>` when the next level's scenario directory exists, otherwise a "no further levels yet" note, plus `reset` and `cleanup`).
 - Levels are switched with `start <level>` only; there is intentionally no `next` command.

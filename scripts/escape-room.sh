@@ -254,6 +254,18 @@ build_app_image() {
   echo -e "${GREEN}✓ Image loaded into the cluster.${NC}"
 }
 
+# Deletes the namespaces of every level except "$1" so old workloads cannot interfere
+remove_other_levels() {
+  local keep="$1" other
+  for other in ${VALID_LEVELS}; do
+    [[ "${other}" == "${keep}" ]] && continue
+    if kubectl get namespace "escape-${other}" > /dev/null 2>&1; then
+      echo -e "${CYAN}→ Removing previous level namespace 'escape-${other}'...${NC}"
+      kubectl delete namespace "escape-${other}" --ignore-not-found=true --wait=true
+    fi
+  done
+}
+
 # ─── Command: start <level> ───────────────────────────────────────────────────
 
 cmd_start() {
@@ -290,6 +302,8 @@ cmd_start() {
   print_banner "${YELLOW}" "🔥  Starting ${level}"
 
   build_app_image "${level}" "${dir}"
+
+  remove_other_levels "${level}"
 
   echo -e "${CYAN}→ Resetting namespace '${namespace}'...${NC}"
   kubectl delete namespace "${namespace}" --ignore-not-found=true --wait=true
