@@ -136,7 +136,7 @@ print_next_steps() {
   if [[ -n "${next}" ]]; then
     echo -e "  Continue:   ${BOLD}./scripts/escape-room.sh start ${next}${NC}"
   else
-    echo -e "  ${GREEN}No more levels available — you cleared them all!${NC}"
+    echo -e "  ${GREEN}No further levels are available yet.${NC}"
   fi
   echo -e "  Retry:      ${BOLD}./scripts/escape-room.sh reset${NC}"
   echo -e "  Tear down:  ${BOLD}./scripts/escape-room.sh cleanup${NC}"

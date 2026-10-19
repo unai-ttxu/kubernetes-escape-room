@@ -31,7 +31,7 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 1. **Deterministic & Quiet In-Cluster Probing**:
    - `verify.sh` first checks rollout completion via `kubectl rollout status deployment/payment-gateway`, so stale pods from a previous ReplicaSet cannot cause false results.
    - Executes an in-cluster ephemeral probe (pinned `curlimages/curl:8.11.1`) against `http://payment-gateway.escape-level-01.svc.cluster.local:80/`.
-   - Probe stderr is captured to tell endpoint failures apart from probe-pod failures (image pull or scheduling).
+   - The probe pod runs detached and its phase is polled (60s max) with a cleanup `trap`; `kubectl run -i --rm` was dropped after the end-to-end test showed it can return exit `0` for a failing curl. `Failed` = endpoint failure, create failure/timeout = probe-pod failure.
    - Idempotent and strictly exits `0` on success, `1` on failure.
 
 2. **Strict Convention Adherence**:
@@ -58,9 +58,9 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 
 ## ✅ Verification & Smoke Test Lifecycle
 
-> Pending: re-run the full smoke test after the review fixes and tick the items below.
+> An agent-run end-to-end smoke test passed on a local Kind cluster (start → verify 1 → hints 1–3 → solve → verify 0 ×3 → reset → verify 1; completed mark cleared on reset; no leaked probe pods). Items stay unticked until the human reviewer confirms.
 
-- [ ] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings.
+- [ ] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings (agent run via `koalaman/shellcheck` image: clean).
 - [ ] **Broken State**: `./scripts/escape-room.sh start level-01` injected broken manifests; pods reliably entered `ImagePullBackOff`.
 - [ ] **Verification Failure**: `./scripts/escape-room.sh verify` exited with code `1` while broken.
 - [ ] **Hint Parsing**: `./scripts/escape-room.sh hint` properly parsed and rendered Hints 1, 2, and 3 sequentially, warning on 4th invocation.

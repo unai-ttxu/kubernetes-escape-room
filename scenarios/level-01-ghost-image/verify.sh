@@ -15,23 +15,42 @@ if ! kubectl rollout status deployment/payment-gateway -n "${NAMESPACE}" --timeo
   exit 1
 fi
 
-# Step 2: In-cluster HTTP probe
-PROBE_OUT=""
-if ! PROBE_OUT=$(kubectl run "${PROBE_POD}" \
+# Step 2: In-cluster HTTP probe.
+# `kubectl run -i --rm` can lose the container exit code when the pod exits
+# before kubectl attaches, so run the pod detached and read its phase instead.
+# shellcheck disable=SC2329
+cleanup() {
+  kubectl delete pod "${PROBE_POD}" -n "${NAMESPACE}" --ignore-not-found=true --wait=false > /dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+if ! kubectl run "${PROBE_POD}" \
   --image="${PROBE_IMAGE}" \
   --restart=Never \
-  --rm \
-  -i \
-  --pod-running-timeout=60s \
   -n "${NAMESPACE}" \
-  -- curl -fsS --max-time 5 "${SERVICE_URL}" 2>&1 > /dev/null); then
-  if [[ "${PROBE_OUT}" == *"curl: ("* ]]; then
-    echo "❌ Endpoint probe failed: service at ${SERVICE_URL} did not return HTTP 200"
-  else
-    echo "⚠️  Could not run the probe pod (image pull or scheduling issue). Retry in a moment."
-  fi
+  -- curl -fsS --max-time 5 -o /dev/null "${SERVICE_URL}" > /dev/null 2>&1; then
+  echo "⚠️  Could not create the probe pod. Retry in a moment."
   exit 1
 fi
+
+PHASE=""
+for _ in $(seq 1 60); do
+  PHASE=$(kubectl get pod "${PROBE_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.phase}' 2>/dev/null || true)
+  [[ "${PHASE}" == "Succeeded" || "${PHASE}" == "Failed" ]] && break
+  sleep 1
+done
+
+case "${PHASE}" in
+  Succeeded) ;;
+  Failed)
+    echo "❌ Endpoint probe failed: service at ${SERVICE_URL} did not return HTTP 200"
+    exit 1
+    ;;
+  *)
+    echo "⚠️  Probe pod did not finish (image pull or scheduling issue). Retry in a moment."
+    exit 1
+    ;;
+esac
 
 echo "✅ Level 01 complete! You escaped!"
 exit 0

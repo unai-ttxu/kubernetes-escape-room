@@ -228,23 +228,30 @@ if ! kubectl rollout status deployment/your-app -n "${NAMESPACE}" --timeout=5s >
   exit 1
 fi
 
-# Step 2: In-cluster HTTP probe (pinned image, capture stderr)
-PROBE_OUT=""
-if ! PROBE_OUT=$(kubectl run "verify-probe-$$" \
-  --image=curlimages/curl:8.11.1 \
-  --restart=Never \
-  --rm \
-  -i \
-  --pod-running-timeout=60s \
-  -n "${NAMESPACE}" \
-  -- curl -fsS --max-time 5 "${SERVICE_URL}" 2>&1 > /dev/null); then
-  if [[ "${PROBE_OUT}" == *"curl: ("* ]]; then
-    echo "❌ Endpoint probe failed: ${SERVICE_URL} did not return HTTP 200"
-  else
-    echo "⚠️  Could not run the probe pod (image pull or scheduling issue). Retry in a moment."
-  fi
+# Step 2: In-cluster HTTP probe (pinned image, detached pod).
+# Do NOT use `kubectl run -i --rm`: it can return 0 when the pod exits before
+# kubectl attaches, so a failing curl would look like a pass.
+PROBE_POD="verify-probe-$$"
+trap 'kubectl delete pod "${PROBE_POD}" -n "${NAMESPACE}" --ignore-not-found --wait=false >/dev/null 2>&1 || true' EXIT
+
+if ! kubectl run "${PROBE_POD}" --image=curlimages/curl:8.11.1 --restart=Never \
+  -n "${NAMESPACE}" -- curl -fsS --max-time 5 -o /dev/null "${SERVICE_URL}" >/dev/null 2>&1; then
+  echo "⚠️  Could not create the probe pod. Retry in a moment."
   exit 1
 fi
+
+PHASE=""
+for _ in $(seq 1 60); do
+  PHASE=$(kubectl get pod "${PROBE_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.phase}' 2>/dev/null || true)
+  [[ "${PHASE}" == "Succeeded" || "${PHASE}" == "Failed" ]] && break
+  sleep 1
+done
+
+case "${PHASE}" in
+  Succeeded) ;;
+  Failed) echo "❌ Endpoint probe failed: ${SERVICE_URL} did not return HTTP 200"; exit 1 ;;
+  *) echo "⚠️  Probe pod did not finish (image pull or scheduling issue). Retry in a moment."; exit 1 ;;
+esac
 
 echo "✅ Level XX complete! You escaped!"
 exit 0
@@ -254,7 +261,8 @@ exit 0
 
 - **Pin every image** in `broken/`, `solution/` and probe pods to a specific version (e.g. `nginx:1.27-alpine`, `curlimages/curl:8.11.1`). Never use `latest` or floating tags like `nginx:alpine`.
 - **`verify.sh` readiness:** use `kubectl rollout status deployment/<name> --timeout=5s` (or `kubectl wait`), never `items[0]` of a pod list — during a rollout the old failing pod can sort first.
-- **`verify.sh` failures must be diagnosable:** capture the probe's stderr and distinguish an endpoint failure from a probe-pod failure (image pull / scheduling). Set `--pod-running-timeout` so a slow registry cannot hang verification.
+- **`verify.sh` probe pods run detached:** create the pod, poll `.status.phase` (`Succeeded`/`Failed`, bounded loop) and clean up with a `trap`. Never rely on the exit code of `kubectl run -i --rm` — it can be lost and report success for a failing curl (found during the M2 end-to-end test).
+- **`verify.sh` failures must be diagnosable:** distinguish an endpoint failure (`Failed` phase) from a probe-pod failure (could not create / did not finish: image pull or scheduling).
 - **Hints are progressive:** Hint 1 = concept, Hint 2 = investigation commands (`describe`, `logs`, `events`) **without** the fix, Hint 3 = AI prompt recipe. Never put the fix command or the correct value in Hints 1–2.
 - **`incident.md` describes symptoms only:** no root cause, no "last deploy" hints, and no endpoints/paths that the workload does not actually serve.
 - **Executable scripts** must be `chmod 750`; re-check after editing with tools that reset modes.
@@ -263,7 +271,7 @@ exit 0
 
 - `setup` checks `docker`, `kind` and `kubectl`; for a missing `docker` or `kind` it prints an install link/hint and exits `1`. A stopped Docker daemon gets a "start Docker Desktop" hint.
 - `start <level>` and `reset` re-break the level **and** remove it from `COMPLETED_LEVELS` in `.room-state`, so `status` never shows a broken level as completed. Only `cleanup` deletes `.room-state`.
-- `verify` success appends the level to `COMPLETED_LEVELS` (exact match, no substring grep) and prints a "What's next?" block (`start <next-level>` when the next level's scenario directory exists, `reset`, `cleanup`).
+- `verify` success appends the level to `COMPLETED_LEVELS` (exact match, no substring grep) and prints a "What's next?" block (`start <next-level>` when the next level's scenario directory exists, otherwise a "no further levels yet" note, plus `reset` and `cleanup`).
 - Levels are switched with `start <level>` only; there is intentionally no `next` command.
 
 ---

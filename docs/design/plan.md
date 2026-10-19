@@ -190,7 +190,7 @@ COMPLETED_LEVELS=
 
 - **Readiness check:** `verify.sh` uses `kubectl rollout status` instead of reading `items[0]` of the pod list, which was unreliable during rollouts (stale `ImagePullBackOff` pod from the old ReplicaSet).
 - **Image pinning:** the Level 01 solution uses `nginx:1.27-alpine` (was `nginx:alpine`) and the verify probe uses `curlimages/curl:8.11.1` (was `latest`), in line with the "pinned digests or well-known tags" constraint.
-- **Probe diagnostics:** `verify.sh` captures probe stderr to separate endpoint failures from probe-pod (pull/scheduling) failures and sets `--pod-running-timeout=60s`.
+- **Probe execution:** `verify.sh` creates the probe pod detached, polls its phase (max 60s) and cleans up with a `trap`, because `kubectl run -i --rm` can lose the container exit code and falsely report success. `Failed` phase = endpoint failure; create failure or timeout = probe-pod (pull/scheduling) failure.
 - **Hints & incident:** Hint 2 no longer includes the fix command; `incident.md` no longer names the cause.
 - **Harness state:** `start`/`reset` remove the level from `COMPLETED_LEVELS`; `verify` success prints next steps. A `next` command was considered and rejected — `start <level>` is the single way to switch levels.
 - **Setup UX:** `setup` prints install links for missing `docker`/`kind` and a start-Docker hint when the daemon is stopped.
