@@ -101,11 +101,20 @@ EOF
 
 # ─── Prerequisite checks ──────────────────────────────────────────────────────
 
+install_hint() {
+  case "$1" in
+    docker)  echo "https://docs.docker.com/get-docker/  (macOS: 'brew install --cask docker')" ;;
+    kind)    echo "https://kind.sigs.k8s.io/docs/user/quick-start/#installation  (macOS: 'brew install kind')" ;;
+    kubectl) echo "https://kubernetes.io/docs/tasks/tools/  (macOS: 'brew install kubectl')" ;;
+  esac
+}
+
 check_prereqs() {
   local missing=0
   for cmd in docker kind kubectl; do
     if ! command -v "${cmd}" > /dev/null 2>&1; then
       echo -e "${RED}✗ Missing required tool: ${cmd}${NC}"
+      echo -e "  ${YELLOW}💡 Install it: $(install_hint "${cmd}")${NC}"
       missing=1
     fi
   done
@@ -160,6 +169,7 @@ cmd_setup() {
   echo -e "${CYAN}→ Checking Docker...${NC}"
   if ! docker info > /dev/null 2>&1; then
     echo -e "${RED}✗ Docker is not running. Please start Docker and retry.${NC}"
+    echo -e "  ${YELLOW}💡 Start Docker Desktop. Not installed? $(install_hint docker)${NC}"
     exit 1
   fi
   echo -e "${GREEN}✓ Docker is running.${NC}"

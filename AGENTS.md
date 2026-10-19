@@ -109,6 +109,8 @@ kubectl version        # >= 1.28
 
 ```bash
 # Create the Kind cluster (first-time setup)
+# Checks for docker, kind and kubectl (and that Docker is running); if any
+# requirement is missing it prints an install link/hint and exits 1.
 ./scripts/escape-room.sh setup
 
 # Tear down the cluster
