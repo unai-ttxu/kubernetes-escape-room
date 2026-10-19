@@ -240,6 +240,20 @@ cmd_setup() {
   echo ""
 }
 
+# Builds scenarios/<level>-*/app/ (if present) and loads it into the kind
+# cluster, so no external registry is needed. Image: escape-room/<level>-app:1.0.0
+build_app_image() {
+  local level="$1" dir="$2"
+  local app_dir="${dir}app"
+  [[ -f "${app_dir}/Dockerfile" ]] || return 0
+
+  local image="escape-room/${level}-app:1.0.0"
+  echo -e "${CYAN}→ Building application image '${image}'...${NC}"
+  docker build -q -t "${image}" "${app_dir}" > /dev/null
+  kind load docker-image "${image}" --name "${CLUSTER_NAME}" > /dev/null
+  echo -e "${GREEN}✓ Image loaded into the cluster.${NC}"
+}
+
 # ─── Command: start <level> ───────────────────────────────────────────────────
 
 cmd_start() {
@@ -274,6 +288,8 @@ cmd_start() {
   local namespace="escape-${level}"
 
   print_banner "${YELLOW}" "🔥  Starting ${level}"
+
+  build_app_image "${level}" "${dir}"
 
   echo -e "${CYAN}→ Resetting namespace '${namespace}'...${NC}"
   kubectl delete namespace "${namespace}" --ignore-not-found=true --wait=true
