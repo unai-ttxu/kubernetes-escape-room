@@ -105,7 +105,6 @@ install_hint() {
   case "$1" in
     docker)  echo "https://docs.docker.com/get-docker/  (macOS: 'brew install --cask docker')" ;;
     kind)    echo "https://kind.sigs.k8s.io/docs/user/quick-start/#installation  (macOS: 'brew install kind')" ;;
-    kubectl) echo "https://kubernetes.io/docs/tasks/tools/  (macOS: 'brew install kubectl')" ;;
   esac
 }
 
@@ -114,7 +113,11 @@ check_prereqs() {
   for cmd in docker kind kubectl; do
     if ! command -v "${cmd}" > /dev/null 2>&1; then
       echo -e "${RED}✗ Missing required tool: ${cmd}${NC}"
-      echo -e "  ${YELLOW}💡 Install it: $(install_hint "${cmd}")${NC}"
+      local hint
+      hint="$(install_hint "${cmd}")"
+      if [[ -n "${hint}" ]]; then
+        echo -e "  ${YELLOW}💡 Install it: ${hint}${NC}"
+      fi
       missing=1
     fi
   done
