@@ -99,6 +99,19 @@ EOF
   echo ""
 }
 
+unmark_completed() {
+  local level="$1"
+  local completed kept="" item
+  completed="$(read_state COMPLETED_LEVELS)"
+  local IFS=','
+  for item in ${completed}; do
+    if [[ "${item}" != "${level}" ]]; then
+      kept="${kept:+${kept},}${item}"
+    fi
+  done
+  write_state "COMPLETED_LEVELS" "${kept}"
+}
+
 # ─── Prerequisite checks ──────────────────────────────────────────────────────
 
 install_hint() {
@@ -244,6 +257,7 @@ cmd_start() {
   init_state
   write_state "CURRENT_LEVEL" "${level}"
   write_state "HINT_LEVEL" "0"
+  unmark_completed "${level}"
 
   # Show incident alert
   local incident_file="${dir}incident.md"
@@ -395,7 +409,7 @@ cmd_verify() {
     # Mark level as completed
     local completed
     completed="$(read_state COMPLETED_LEVELS)"
-    if ! echo "${completed}" | grep -q "${level}"; then
+    if [[ ",${completed}," != *",${level},"* ]]; then
       if [[ -z "${completed}" ]]; then
         write_state "COMPLETED_LEVELS" "${level}"
       else
@@ -489,6 +503,7 @@ cmd_reset() {
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
 
   write_state "HINT_LEVEL" "0"
+  unmark_completed "${level}"
 
   echo -e "${GREEN}✓ Broken state restored.${NC}"
   echo ""

@@ -136,6 +136,7 @@ kubectl version        # >= 1.28
 ./scripts/escape-room.sh solve
 
 # Re-inject broken state without restarting cluster
+# (also removes the level from COMPLETED_LEVELS; `start` does the same)
 ./scripts/escape-room.sh reset
 
 # Cleanup
