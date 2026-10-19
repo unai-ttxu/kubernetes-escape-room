@@ -25,6 +25,8 @@ All levels run locally via a single CLI tool:
 ./scripts/escape-room.sh hint           # get a progressive hint
 ./scripts/escape-room.sh verify         # check if you've escaped
 ./scripts/escape-room.sh solve          # reveal the solution (instructor only)
+./scripts/escape-room.sh reset          # re-break the current level and retry
+./scripts/escape-room.sh cleanup        # tear down the Kind cluster
 ```
 
 ---
@@ -59,10 +61,12 @@ kubernetes-escape-room/
 ## Prerequisites
 
 ```bash
-docker --version   # Docker Desktop or Colima
+docker --version   # Docker Desktop
 kind --version     # >= 0.20.0
 kubectl version    # >= 1.28
 ```
+
+`./scripts/escape-room.sh setup` checks these for you and prints an install link if `docker` or `kind` is missing. After a level is verified, the CLI shows the next step (e.g. `start level-02`); use `start <level>` to move between levels.
 
 ---
 

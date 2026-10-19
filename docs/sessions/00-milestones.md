@@ -173,7 +173,7 @@ docs/
 
 **`pre-workshop-checklist.md` must cover:**
 - Instructor pre-event: cluster creation, image availability, level smoke-tests
-- Attendee prereqs: `kubectl`, `kind`, Docker Desktop / Colima
+- Attendee prereqs: `kubectl`, `kind`, Docker Desktop
 - Fallback options if local cluster fails
 
 **Review checklist (final human gate before event):**

@@ -44,6 +44,16 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
    - Hint 2 provides `kubectl describe pod` and events triage commands without revealing the fix.
    - Hint 3 provides a reusable SRE Copilot Prompt Pattern (Context + Symptom + kubectl output + Goal) for free AI assistants.
 
+4. **Review Hardening** (PR #4 review, see [`plan.md` Amendment 1](../design/plan.md)):
+   - Pinned images (`nginx:1.27-alpine` solution, `curlimages/curl:8.11.1` probe) and rollout-based readiness in `verify.sh`.
+   - Hint 2 and `incident.md` no longer leak the fix or root cause.
+   - Review gates and smoke-test items intentionally left unticked until human review (AGENTS.md rules 17–18).
+
+5. **Harness Improvements** (`scripts/escape-room.sh`):
+   - `setup` prints install links for missing `docker`/`kind` and a hint when Docker is not running.
+   - `start` and `reset` clear the level from `COMPLETED_LEVELS`; `verify` success matches levels exactly and prints a "What's next?" block.
+   - No `next` command by design — `start <level>` is the only way to switch levels.
+
 ---
 
 ## ✅ Verification & Smoke Test Lifecycle
