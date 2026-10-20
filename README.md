@@ -51,7 +51,8 @@ kubernetes-escape-room/
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
     │   ├── 01-milestone-01.md       # Session 1: Core harness & cluster setup
-    │   └── 02-milestone-02.md       # Session 2: Level 01 — The Ghost Image
+    │   ├── 02-milestone-02.md       # Session 2: Level 01 — The Ghost Image
+    │   └── 04-milestone-04.md       # Session 4: Level 03 — The Silent Wall
     ├── ai-prompts-cheatsheet.md     # SRE Copilot Prompt Pattern (coming soon)
     └── pre-workshop-checklist.md    # Instructor & attendee checklist (coming soon)
 ```

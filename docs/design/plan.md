@@ -194,3 +194,13 @@ COMPLETED_LEVELS=
 - **Hints & incident:** Hint 2 no longer includes the fix command; `incident.md` no longer names the cause.
 - **Harness state:** `start`/`reset` remove the level from `COMPLETED_LEVELS`; `verify` success prints next steps. A `next` command was considered and rejected — `start <level>` is the single way to switch levels.
 - **Setup UX:** `setup` prints install links for missing `docker`/`kind` and a start-Docker hint when the daemon is stopped.
+
+### Amendment 2 — Cilium CNI for NetworkPolicy enforcement (M4)
+
+*Flagged for human review.*
+
+- **Problem:** kind's default CNI (kindnet) does not enforce NetworkPolicy, so the Level 03 policy fault would not block traffic.
+- **Decision:** the cluster is created with `networking.disableDefaultCNI: true`, and `setup` installs Cilium 1.20.2 from a pinned manifest, `kind/cni/cilium.yaml` (rendered with helm, no helm at runtime). kube-proxy is kept (`kubeProxyReplacement=false`), with Kubernetes IPAM and Envoy disabled to limit image pulls. Hubble, Hubble Relay and the Hubble UI are enabled so attendees and instructors can observe dropped flows.
+- **Alternatives considered:** Calico (heavier to maintain, same setup cost), Antrea (fewer references), Weave Net (unmaintained), or replacing the policy fault with a Service selector mismatch that kindnet can enforce.
+- **Harness safety:** all `kubectl` calls use the generated `kind-kubeconfig.yaml` and the `kind-escape-room` context, because the harness previously used whatever kubectl context was current. The file holds client credentials, so it is gitignored and removed by `cleanup`.
+- **Cost for attendees:** `setup` now pulls Cilium images and waits for nodes `Ready`. Existing clusters created with kindnet must be recreated (`cleanup`, then `setup`).

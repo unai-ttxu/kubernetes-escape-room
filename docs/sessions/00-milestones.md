@@ -121,7 +121,7 @@ scenarios/level-02-crashing-config/
 
 ## Milestone 4 — Level 03: "The Silent Wall" (Boss Level)
 
-**Status:** ⬜ Not started  
+**Status:** 🔍 In review  
 **Namespace:** `escape-level-03`  
 **Duration target:** 15–20 min
 
