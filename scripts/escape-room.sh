@@ -232,7 +232,10 @@ check_not_kindnet() {
 export_kubeconfig() {
   mkdir -p "${KIND_KUBECONFIG%/*}"
   chmod 700 "${KIND_KUBECONFIG%/*}"
-  kind export kubeconfig --name "${CLUSTER_NAME}" --kubeconfig "${KIND_KUBECONFIG}" > /dev/null 2>&1
+  if ! kind export kubeconfig --name "${CLUSTER_NAME}" --kubeconfig "${KIND_KUBECONFIG}" > /dev/null; then
+    echo -e "${RED}✗ Could not write ${KIND_KUBECONFIG#"${SCRIPT_DIR}/"}.${NC}"
+    exit 1
+  fi
   chmod 600 "${KIND_KUBECONFIG}"
   export KUBECONFIG="${KIND_KUBECONFIG}"
 }
@@ -320,6 +323,15 @@ wait_for_deployments() {
   done
 }
 
+# Waits for the Deployments of levels whose broken state still rolls out Ready.
+# Level 01 must stay broken (ImagePullBackOff), so it is intentionally skipped.
+wait_for_level_rollout() {
+  local level="$1" namespace="$2"
+  case "${level}" in
+    level-03) wait_for_deployments "${namespace}" backend frontend ;;
+  esac
+}
+
 # Deletes the namespaces of every level except "$1" so old workloads cannot interfere
 remove_other_levels() {
   local keep="$1" other
@@ -380,11 +392,7 @@ cmd_start() {
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
   echo -e "${GREEN}✓ Broken state injected.${NC}"
 
-  # Level 01 must stay broken (ImagePullBackOff), so only levels whose broken
-  # state still rolls out Ready wait here.
-  if [[ "${level}" == "level-03" ]]; then
-    wait_for_deployments "${namespace}" backend frontend
-  fi
+  wait_for_level_rollout "${level}" "${namespace}"
 
   # Update state
   init_state
@@ -638,9 +646,7 @@ cmd_reset() {
   echo -e "${CYAN}→ Re-injecting broken manifests...${NC}"
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
 
-  if [[ "${level}" == "level-03" ]]; then
-    wait_for_deployments "${namespace}" backend frontend
-  fi
+  wait_for_level_rollout "${level}" "${namespace}"
 
   write_state "HINT_LEVEL" "0"
   unmark_completed "${level}"

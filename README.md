@@ -41,7 +41,10 @@ kubernetes-escape-room/
 ├── scripts/
 │   └── escape-room.sh               # Main CLI harness (pure Bash, zero deps)
 ├── kind/
-│   └── cluster-config.yaml          # Kind cluster definition
+│   ├── cluster-config.yaml          # Kind cluster definition (disableDefaultCNI)
+│   ├── cni/
+│   │   └── cilium.yaml              # Pinned Cilium 1.20.2 manifest (enforces NetworkPolicy)
+│   └── .kube/config                 # Repo-local kubeconfig (gitignored, written by `setup`)
 ├── scenarios/
 │   ├── level-01-ghost-image/
 │   ├── level-02-crashing-config/
@@ -70,7 +73,7 @@ kind --version     # >= 0.20.0
 kubectl version    # >= 1.28
 ```
 
-`./scripts/escape-room.sh setup` checks these for you and prints an install link if `docker` or `kind` is missing. After a level is verified, the CLI shows the next step (e.g. `start level-02`); use `start <level>` to move between levels.
+`./scripts/escape-room.sh setup` checks these for you and prints an install link if `docker` or `kind` is missing. `setup` also installs Cilium (needed so Level 03's NetworkPolicy is enforced), so the first run pulls extra images and takes a few minutes longer. It writes a repo-local kubeconfig, `kind/.kube/config`, which the CLI uses for every `kubectl` call, so your current kubectl context is never touched. A cluster created before Cilium was added must be recreated: `cleanup`, then `setup`. After a level is verified, the CLI shows the next step (e.g. `start level-02`); use `start <level>` to move between levels.
 
 ---
 
