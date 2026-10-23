@@ -42,21 +42,25 @@ Implement Level 03 ("The Silent Wall") under `scenarios/level-03-silent-wall/` i
 
 ## ⚠️ Known Gaps (not verified)
 
-- **NetworkPolicy enforcement needs a policy-enforcing CNI.** kind's default CNI (kindnet) does **not** enforce NetworkPolicy, so the cluster now uses `networking.disableDefaultCNI: true` and `setup` installs a pinned Cilium 1.20.2 (`kind/cni/cilium.yaml`). See `plan.md` Amendment 3 (flagged for review). Not yet run on a cluster.
-- **kubectl context safety (fixed in this change):** the harness previously ran `kubectl` against the *current* context. On the machine used for this session that was a remote EKS cluster, so `start level-03` could have applied the broken manifests there. `setup` now writes a repo-local kubeconfig, `kind/.kube/config`, with `kind export kubeconfig` (re-run on every `setup`, so certificates stay in sync). The harness exports `KUBECONFIG` to it and each `verify.sh` pins it too, so no `kubectl` call uses the current context. kind still updates `~/.kube/config` as usual. The file is gitignored and removed by `cleanup`.
+- **NetworkPolicy enforcement needs a policy-enforcing CNI.** kind's default CNI (kindnet) does **not** enforce NetworkPolicy, so the cluster now uses `networking.disableDefaultCNI: true` and `setup` installs a pinned Cilium 1.20.2 (`kind/cni/cilium.yaml`). See `plan.md` Amendment 3 (flagged for review). Verified on a kind cluster (see below).
+- **kubectl context safety (fixed in this change):** the harness previously ran `kubectl` against the *current* context, which on the machine used for this session was a remote EKS cluster, so `start level-03` could have applied the broken manifests there. `setup` now writes a repo-local kubeconfig, `kind/.kube/config`, with `kind export kubeconfig` (re-run on every `setup`). The harness exports `KUBECONFIG` to it and each `verify.sh` pins it too, so no `kubectl` call uses the current context. kind still updates `~/.kube/config` as usual. The file is gitignored and removed by `cleanup`.
 
 ---
 
 ## ✅ Verification & Smoke Test Lifecycle
 
-> Nothing has been run against a cluster yet. Docker Desktop was not running and `shellcheck` is not installed on the agent machine, so the items below stay unticked (AGENTS.md rules 17–18).
+> Run on a kind cluster with Cilium (default kubeconfig emptied to prove the pinning). The review items below stay unticked until the human approves (AGENTS.md rules 17–18).
 
-Checks that **were** run locally:
+Checks that **were** run:
 
-- `bash -n scenarios/level-03-silent-wall/verify.sh`: syntax OK.
-- All 14 level-03 manifests parse as YAML (`ruby -ryaml`); each container has `requests` and `limits`; every object sets `namespace: escape-level-03` and `level: "03"`.
-- `kubectl apply --dry-run` was **not** usable: the current kubectl context points at a remote cluster and failed on credentials. No resources were applied anywhere.
-- `scripts/escape-room.sh` and `scenarios/level-01-ghost-image/verify.sh` modes were corrected from `755` to `750` (AGENTS.md rule 7). Git tracks only the owner-executable bit, so this produces no diff.
+- `shellcheck` clean on `scripts/escape-room.sh` and `scenarios/*/verify.sh`; `bash -n` OK.
+- All 14 level-03 manifests parse as YAML; each container has `requests` and `limits`; every object sets `namespace: escape-level-03` and `level: "03"`.
+- `setup` twice (idempotent): Cilium and Hubble up, nodes `Ready`; `kind/.kube/` is 700, `config` is 600. `cleanup` removes the cluster and `kind/.kube/`; `status` without the file prints the "run setup" hint.
+- Level 03: `verify` 1 broken, 0 after `solve`, 1 after `reset`; fixing only the Service port still fails `verify`.
+- Levels 01 and 02: `verify` 1 broken, 0 after `solve`, 1 after `reset`. One level 02 `verify` immediately after `solve` failed once and passed on three repeats (not reproduced; possible timing flake).
+- `scripts/escape-room.sh` and the `verify.sh` files are mode `750` (AGENTS.md rule 7).
+
+Not run: the hint renderer (`./scripts/escape-room.sh hint`) on level 03, and a clean-machine `setup` (the pre-event gate).
 
 Checklist for the human reviewer:
 
