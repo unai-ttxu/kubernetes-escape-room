@@ -26,7 +26,10 @@ Implement Level 03 ("The Silent Wall") under `scenarios/level-03-silent-wall/` i
 | `solution/*` | Same set with `targetPort: 9000` and the NetworkPolicy selecting `role: web-frontend` |
 | `incident.md` | Pager alert `#INC-8103` describing symptoms only |
 | `hints.md` | 3 tiered hints (concept → `get ep` / `get netpol` investigation → AI prompt recipe) |
-| `verify.sh` | Rollout check for both Deployments, then a detached in-cluster probe of `/api/data` through the frontend that checks HTTP 200 **and** the backend payload (chmod 750) |
+| `kind/cluster-config.yaml` | `disableDefaultCNI: true`, explicit pod/service subnets (`10.10.0.0/16`, `10.11.0.0/16`) |
+| `kind/cni/cilium.yaml` | Pinned Cilium 1.20.2 manifest (helm-rendered, Hubble enabled) so NetworkPolicy is enforced |
+| `scripts/escape-room.sh` | `setup` installs Cilium and writes `kind/.kube/config`; `KUBECONFIG` pinning; `wait_for_level_rollout` after `start`/`reset`; `solve` warns on a stalled rollout; `cleanup` removes `kind/.kube/` and `.room-state` |
+| `verify.sh` (levels 01–03) | Pin `KUBECONFIG` to `kind/.kube/config`; level 03 also does the rollout check for both Deployments, then a detached in-cluster probe of `/api/data` through the frontend that checks HTTP 200 **and** the backend payload (chmod 750) |
 
 ---
 
@@ -36,7 +39,9 @@ Implement Level 03 ("The Silent Wall") under `scenarios/level-03-silent-wall/` i
 2. **Frontend proxy uses a runtime resolver:** `proxy_pass` goes through a variable and `resolver kube-dns...`, so nginx does not fail at startup if the backend Service DNS record is not yet visible.
 3. **Nginx-only workloads:** both tiers use pinned `nginx:1.27-alpine` with the configuration mounted from a ConfigMap, so no custom image has to be built or loaded into kind.
 4. **Fix location for bug 2:** the NetworkPolicy is corrected to select `role: web-frontend` (the frontend's real label) rather than relabelling the frontend, so the policy still expresses the intended "only the frontend may call the backend" rule.
-5. **Hint discipline:** Hints 1–2 name the places to look (Service port vs. container port, policy `from` selector vs. pod labels) without giving the corrected values. Hint 3 is the SRE copilot prompt.
+5. **Pinned kubeconfig:** `kind/.kube/config` is written by `kind export kubeconfig` on every `setup` and exported as `KUBECONFIG` by the harness; each `verify.sh` pins it as well. kind still updates `~/.kube/config`, so manual `kubectl` use is unchanged.
+6. **Rollout wait helper:** `wait_for_level_rollout` (level-03 only for now) makes `start` and `reset` block until the Deployments are Ready; level 01 must stay broken, so it is skipped.
+7. **Hint discipline:** Hints 1–2 name the places to look (Service port vs. container port, policy `from` selector vs. pod labels) without giving the corrected values. Hint 3 is the SRE copilot prompt.
 
 ---
 
@@ -57,6 +62,7 @@ Checks that **were** run:
 - All 14 level-03 manifests parse as YAML; each container has `requests` and `limits`; every object sets `namespace: escape-level-03` and `level: "03"`.
 - `setup` twice (idempotent): Cilium and Hubble up, nodes `Ready`; `kind/.kube/` is 700, `config` is 600. `cleanup` removes the cluster and `kind/.kube/`; `status` without the file prints the "run setup" hint.
 - Level 03: `verify` 1 broken, 0 after `solve`, 1 after `reset`; fixing only the Service port still fails `verify`.
+- After the final refactor (`wait_for_level_rollout`, kubeconfig error handling): level 03 `start`, `reset`, `verify`, `solve` and a level 01 `start` re-run OK.
 - Levels 01 and 02: `verify` 1 broken, 0 after `solve`, 1 after `reset`. One level 02 `verify` immediately after `solve` failed once and passed on three repeats (not reproduced; possible timing flake).
 - `scripts/escape-room.sh` and the `verify.sh` files are mode `750` (AGENTS.md rule 7).
 
