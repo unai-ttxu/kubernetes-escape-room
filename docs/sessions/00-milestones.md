@@ -168,6 +168,7 @@ docs/
 ├── ai-prompts-cheatsheet.md    # Extended: workflow, stage prompts, guardrails, evaluation rubric
 ├── ai-research-notes.md        # Cited sources (links + dates), established vs emerging practices
 └── ai-exercises.md             # Instructor guide: bad vs good prompts per level, challenge exercise, facilitator notes
+scenarios/*/ai-assist.md        # Attendee AI tip per level, shown by `./scripts/escape-room.sh ai-assist`
 # Facilitator notes live in ai-exercises.md, not hints.md (the hint command prints everything under a hint heading)
 ```
 

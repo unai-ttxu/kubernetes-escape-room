@@ -23,6 +23,7 @@ All levels run locally via a single CLI tool:
 ./scripts/escape-room.sh setup          # spin up a Kind cluster
 ./scripts/escape-room.sh start level-01 # inject the broken scenario (or level-02)
 ./scripts/escape-room.sh hint           # get a progressive hint
+./scripts/escape-room.sh ai-assist      # tip for using an AI copilot on this level
 ./scripts/escape-room.sh verify         # check if you've escaped
 ./scripts/escape-room.sh solve          # reveal the solution (instructor only)
 ./scripts/escape-room.sh reset          # re-break the current level and retry

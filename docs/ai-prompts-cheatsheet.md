@@ -194,4 +194,4 @@ kubectl get endpoints -n <ns>
 kubectl get netpol -n <ns> -o yaml
 ```
 
-Harness: `./scripts/escape-room.sh hint` (next hint), `status`, `verify`.
+Harness: `./scripts/escape-room.sh hint` (next hint), `ai-assist` (AI tip for the current level, free of hints), `status`, `verify`.

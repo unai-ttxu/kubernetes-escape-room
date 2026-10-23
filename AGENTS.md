@@ -68,6 +68,7 @@ kubernetes-escape-room/
 │   │   ├── solution/                # Reference fix manifests
 │   │   ├── incident.md              # Pager-style alert shown to attendees
 │   │   ├── hints.md                 # 3-tier progressive hints
+│   │   ├── ai-assist.md             # AI copilot tip (shown by `ai-assist`, no spoilers)
 │   │   └── verify.sh                # Deterministic verification probe
 │   ├── level-02-crashing-config/
 │   │   ├── app/                     # Self-contained app source + Dockerfile (built by `start`)
@@ -137,6 +138,9 @@ kubectl version        # >= 1.28
 
 # Get the next hint
 ./scripts/escape-room.sh hint
+
+# Show the AI copilot tip for the current level (does not use a hint)
+./scripts/escape-room.sh ai-assist
 
 # Verify the scenario is fixed
 # (on success, prints next steps: start the next level, reset, or cleanup)
@@ -287,6 +291,7 @@ exit 0
 - `start <level>` builds `scenarios/<level>-*/app/` when it contains a `Dockerfile` and loads the image into the kind cluster (`escape-room/<level>-app:1.0.0`, e.g. `escape-room/level-02-app:1.0.0`), so no external registry is needed. Manifests reference that tag with `imagePullPolicy: IfNotPresent`. `reset` reuses the loaded image.
 - `start` and `reset` wait (via `wait_for_level_rollout`, currently level-03 only; level 01 must stay broken) up to 120s for both Deployments to roll out before returning, so an immediate `verify` reports the real fault rather than "not ready". `solve` prints a warning (instead of silently continuing) if its rollout does not finish in 120s.
 - `verify` success appends the level to `COMPLETED_LEVELS` (exact match, no substring grep) and prints a "What's next?" block (`start <next-level>` when the next level's scenario directory exists, otherwise a "no further levels yet" note, plus `reset` and `cleanup`).
+- `ai-assist` prints `scenarios/<level>-*/ai-assist.md` for the current level (`cat`, no parsing). It is independent of `HINT_LEVEL` and never changes `.room-state`. `ai-assist.md` follows the hint discipline: no fix, no root cause, no correct values. It is a separate file from `hints.md` on purpose, since `extract_hint` prints everything under a hint heading. `start` lists the command in its "Useful commands".
 - Levels are switched with `start <level>` only; there is intentionally no `next` command.
 
 ---
