@@ -2,7 +2,7 @@
 
 > **Date:** 2026-10-20  
 > **Status:** 🔍 In review  
-> **Branch:** not created — changes are uncommitted in the working tree (AGENTS.md rule 11)
+> **Branch:** `feat/M4`
 
 ---
 
@@ -42,8 +42,8 @@ Implement Level 03 ("The Silent Wall") under `scenarios/level-03-silent-wall/` i
 
 ## ⚠️ Known Gaps (not verified)
 
-- **NetworkPolicy enforcement needs a policy-enforcing CNI.** kind's default CNI (kindnet) does **not** enforce NetworkPolicy, so the cluster now uses `networking.disableDefaultCNI: true` and `setup` installs a pinned Cilium 1.20.2 (`kind/cni/cilium.yaml`). See `plan.md` Amendment 2 (flagged for review). Not yet run on a cluster.
-- **kubectl context safety (fixed in this change):** the harness previously ran `kubectl` against the *current* context. On the machine used for this session that was a remote EKS cluster, so `start level-03` could have applied the broken manifests there. Every harness `kubectl` call, and `verify.sh` through the exported function, now uses the `kind-escape-room` context from `kind-kubeconfig.yaml`. `setup` regenerates that file with `kind export kubeconfig`, so its certificates stay in sync with the cluster. The file is gitignored.
+- **NetworkPolicy enforcement needs a policy-enforcing CNI.** kind's default CNI (kindnet) does **not** enforce NetworkPolicy, so the cluster now uses `networking.disableDefaultCNI: true` and `setup` installs a pinned Cilium 1.20.2 (`kind/cni/cilium.yaml`). See `plan.md` Amendment 3 (flagged for review). Not yet run on a cluster.
+- **kubectl context safety (fixed in this change):** the harness previously ran `kubectl` against the *current* context. On the machine used for this session that was a remote EKS cluster, so `start level-03` could have applied the broken manifests there. `setup` now writes a repo-local kubeconfig, `kind/.kube/config`, with `kind export kubeconfig` (re-run on every `setup`, so certificates stay in sync). The harness exports `KUBECONFIG` to it and each `verify.sh` pins it too, so no `kubectl` call uses the current context. kind still updates `~/.kube/config` as usual. The file is gitignored and removed by `cleanup`.
 
 ---
 

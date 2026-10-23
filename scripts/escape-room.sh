@@ -15,6 +15,7 @@ readonly SCRIPT_DIR
 readonly STATE_FILE="${SCRIPT_DIR}/.room-state"
 readonly KIND_CONFIG="${SCRIPT_DIR}/kind/cluster-config.yaml"
 readonly CILIUM_MANIFEST="${SCRIPT_DIR}/kind/cni/cilium.yaml"
+readonly KIND_KUBECONFIG="${SCRIPT_DIR}/kind/.kube/config"
 readonly SCENARIOS_DIR="${SCRIPT_DIR}/scenarios"
 readonly CLUSTER_NAME="escape-room"
 readonly VALID_LEVELS="level-01 level-02 level-03 level-04"
@@ -182,6 +183,12 @@ require_cluster() {
     echo -e "  Run ${BOLD}./scripts/escape-room.sh setup${NC} first."
     exit 1
   fi
+  if ! grep -q "kind-${CLUSTER_NAME}" "${KIND_KUBECONFIG}" 2>/dev/null; then
+    echo -e "${RED}✗ Kubeconfig ${KIND_KUBECONFIG#"${SCRIPT_DIR}/"} is missing.${NC}"
+    echo -e "  Run ${BOLD}./scripts/escape-room.sh setup${NC} to regenerate it."
+    exit 1
+  fi
+  export KUBECONFIG="${KIND_KUBECONFIG}"
 }
 
 require_state() {
@@ -212,25 +219,35 @@ validate_level() {
 # Exits 1 when the cluster was created with kindnet (no NetworkPolicy support).
 # Cilium cannot be layered on top of kindnet, so the user must recreate it.
 check_not_kindnet() {
-  if kubectl get daemonset kindnet -n kube-system --context "kind-${CLUSTER_NAME}" > /dev/null 2>&1; then
+  if kubectl get daemonset kindnet -n kube-system > /dev/null 2>&1; then
     echo -e "${RED}✗ Cluster '${CLUSTER_NAME}' was created with kindnet, which does not enforce NetworkPolicy.${NC}"
     echo -e "  Run ${BOLD}./scripts/escape-room.sh cleanup${NC} followed by ${BOLD}./scripts/escape-room.sh setup${NC}."
     exit 1
   fi
 }
 
+# Writes a repo-local kubeconfig holding only the kind cluster, so every harness
+# kubectl call is pinned to it whatever the user's current context is. kind also
+# keeps updating the default ~/.kube/config as usual.
+export_kubeconfig() {
+  mkdir -p "${KIND_KUBECONFIG%/*}"
+  chmod 700 "${KIND_KUBECONFIG%/*}"
+  kind export kubeconfig --name "${CLUSTER_NAME}" --kubeconfig "${KIND_KUBECONFIG}" > /dev/null 2>&1
+  chmod 600 "${KIND_KUBECONFIG}"
+  export KUBECONFIG="${KIND_KUBECONFIG}"
+}
+
 # Installs the pinned Cilium CNI (kind/cni/cilium.yaml) with Hubble, then waits
 # for every component and all nodes to be Ready. Re-applying is idempotent.
 install_cilium() {
-  local context="kind-${CLUSTER_NAME}"
   echo -e "${CYAN}→ Installing Cilium CNI (pinned 1.20.2)...${NC}"
-  kubectl apply --server-side --force-conflicts --context "${context}" -f "${CILIUM_MANIFEST}" > /dev/null
-  kubectl rollout status daemonset/cilium -n kube-system --context "${context}" --timeout=300s > /dev/null
-  kubectl rollout status deployment/cilium-operator -n kube-system --context "${context}" --timeout=300s > /dev/null
-  kubectl rollout status deployment/hubble-relay -n kube-system --context "${context}" --timeout=300s > /dev/null
-  kubectl rollout status deployment/hubble-ui -n kube-system --context "${context}" --timeout=300s > /dev/null
+  kubectl apply --server-side --force-conflicts -f "${CILIUM_MANIFEST}" > /dev/null
+  kubectl rollout status daemonset/cilium -n kube-system --timeout=300s > /dev/null
+  kubectl rollout status deployment/cilium-operator -n kube-system --timeout=300s > /dev/null
+  kubectl rollout status deployment/hubble-relay -n kube-system --timeout=300s > /dev/null
+  kubectl rollout status deployment/hubble-ui -n kube-system --timeout=300s > /dev/null
   echo -e "${CYAN}→ Waiting for all nodes to be Ready...${NC}"
-  kubectl wait --for=condition=Ready nodes --all --context "${context}" --timeout=300s > /dev/null
+  kubectl wait --for=condition=Ready nodes --all --timeout=300s > /dev/null
   echo -e "${GREEN}✓ Cilium is ready and all nodes are Ready.${NC}"
 }
 
@@ -255,8 +272,12 @@ cmd_setup() {
     echo -e "${GREEN}✓ Cluster created.${NC}"
   fi
 
+  echo -e "${CYAN}→ Writing repo kubeconfig (kind/.kube/config)...${NC}"
+  export_kubeconfig
+  echo -e "${GREEN}✓ Kubeconfig written.${NC}"
+
   echo -e "${CYAN}→ Verifying kubectl connectivity...${NC}"
-  kubectl cluster-info --context "kind-${CLUSTER_NAME}" > /dev/null
+  kubectl cluster-info > /dev/null
   echo -e "${GREEN}✓ kubectl is connected to the cluster.${NC}"
 
   check_not_kindnet
@@ -627,12 +648,17 @@ cmd_cleanup() {
 
   if ! cluster_exists; then
     echo -e "${YELLOW}⚠  Cluster '${CLUSTER_NAME}' does not exist — nothing to do.${NC}"
-    return
+  else
+    echo -e "${CYAN}→ Deleting kind cluster '${CLUSTER_NAME}'...${NC}"
+    kind delete cluster --name "${CLUSTER_NAME}"
+    echo -e "${GREEN}✓ Cluster deleted.${NC}"
   fi
 
-  echo -e "${CYAN}→ Deleting kind cluster '${CLUSTER_NAME}'...${NC}"
-  kind delete cluster --name "${CLUSTER_NAME}"
-  echo -e "${GREEN}✓ Cluster deleted.${NC}"
+  # Repo kubeconfig holds client credentials
+  if [[ -d "${KIND_KUBECONFIG%/*}" ]]; then
+    rm -rf "${KIND_KUBECONFIG%/*}"
+    echo -e "${GREEN}✓ Repo kubeconfig removed.${NC}"
+  fi
 
   # Clear state
   if [[ -f "${STATE_FILE}" ]]; then

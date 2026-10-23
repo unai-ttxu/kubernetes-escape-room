@@ -2,4 +2,4 @@
 *.kubeconfig
 kubeconfig
 .DS_Store
-kind-kubeconfig.yaml
+kind/.kube/
