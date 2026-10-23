@@ -380,6 +380,8 @@ cmd_start() {
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
   echo -e "${GREEN}✓ Broken state injected.${NC}"
 
+  # Level 01 must stay broken (ImagePullBackOff), so only levels whose broken
+  # state still rolls out Ready wait here.
   if [[ "${level}" == "level-03" ]]; then
     wait_for_deployments "${namespace}" backend frontend
   fi
@@ -592,7 +594,9 @@ cmd_solve() {
 
   echo ""
   echo -e "${GREEN}✓ Solution applied. Waiting for pods to stabilise...${NC}"
-  kubectl rollout status deployment -n "${namespace}" --timeout=120s 2>/dev/null || true
+  if ! kubectl rollout status deployment -n "${namespace}" --timeout=120s > /dev/null 2>&1; then
+    echo -e "${YELLOW}⚠  Deployments are not ready after 120s. Check: kubectl get pods -n ${namespace}${NC}"
+  fi
   echo ""
   echo -e "Run ${BOLD}./scripts/escape-room.sh verify${NC} to confirm the level is complete."
 }
@@ -633,6 +637,10 @@ cmd_reset() {
 
   echo -e "${CYAN}→ Re-injecting broken manifests...${NC}"
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
+
+  if [[ "${level}" == "level-03" ]]; then
+    wait_for_deployments "${namespace}" backend frontend
+  fi
 
   write_state "HINT_LEVEL" "0"
   unmark_completed "${level}"

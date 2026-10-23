@@ -282,6 +282,7 @@ exit 0
 - `start <level>` and `reset` re-break the level **and** remove it from `COMPLETED_LEVELS` in `.room-state`, so `status` never shows a broken level as completed. Only `cleanup` deletes `.room-state`.
 - `start <level>` first deletes the namespaces of all other levels (completed marks in `.room-state` are kept), so a previous level never interferes with the new one.
 - `start <level>` builds `scenarios/<level>-*/app/` when it contains a `Dockerfile` and loads the image into the kind cluster (`escape-room/<level>-app:1.0.0`, e.g. `escape-room/level-02-app:1.0.0`), so no external registry is needed. Manifests reference that tag with `imagePullPolicy: IfNotPresent`. `reset` reuses the loaded image.
+- `start level-03` and `reset` (level-03) wait up to 120s for both Deployments to roll out before returning, so an immediate `verify` reports the real fault rather than "not ready". `solve` prints a warning (instead of silently continuing) if its rollout does not finish in 120s.
 - `verify` success appends the level to `COMPLETED_LEVELS` (exact match, no substring grep) and prints a "What's next?" block (`start <next-level>` when the next level's scenario directory exists, otherwise a "no further levels yet" note, plus `reset` and `cleanup`).
 - Levels are switched with `start <level>` only; there is intentionally no `next` command.
 
