@@ -14,6 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly SCRIPT_DIR
 readonly STATE_FILE="${SCRIPT_DIR}/.room-state"
 readonly KIND_CONFIG="${SCRIPT_DIR}/kind/cluster-config.yaml"
+readonly CILIUM_MANIFEST="${SCRIPT_DIR}/kind/cni/cilium.yaml"
 readonly SCENARIOS_DIR="${SCRIPT_DIR}/scenarios"
 readonly CLUSTER_NAME="escape-room"
 readonly VALID_LEVELS="level-01 level-02 level-03 level-04"
@@ -208,6 +209,31 @@ validate_level() {
 
 # ─── Command: setup ───────────────────────────────────────────────────────────
 
+# Exits 1 when the cluster was created with kindnet (no NetworkPolicy support).
+# Cilium cannot be layered on top of kindnet, so the user must recreate it.
+check_not_kindnet() {
+  if kubectl get daemonset kindnet -n kube-system --context "kind-${CLUSTER_NAME}" > /dev/null 2>&1; then
+    echo -e "${RED}✗ Cluster '${CLUSTER_NAME}' was created with kindnet, which does not enforce NetworkPolicy.${NC}"
+    echo -e "  Run ${BOLD}./scripts/escape-room.sh cleanup${NC} followed by ${BOLD}./scripts/escape-room.sh setup${NC}."
+    exit 1
+  fi
+}
+
+# Installs the pinned Cilium CNI (kind/cni/cilium.yaml) with Hubble, then waits
+# for every component and all nodes to be Ready. Re-applying is idempotent.
+install_cilium() {
+  local context="kind-${CLUSTER_NAME}"
+  echo -e "${CYAN}→ Installing Cilium CNI (pinned 1.20.2)...${NC}"
+  kubectl apply --server-side --force-conflicts --context "${context}" -f "${CILIUM_MANIFEST}" > /dev/null
+  kubectl rollout status daemonset/cilium -n kube-system --context "${context}" --timeout=300s > /dev/null
+  kubectl rollout status deployment/cilium-operator -n kube-system --context "${context}" --timeout=300s > /dev/null
+  kubectl rollout status deployment/hubble-relay -n kube-system --context "${context}" --timeout=300s > /dev/null
+  kubectl rollout status deployment/hubble-ui -n kube-system --context "${context}" --timeout=300s > /dev/null
+  echo -e "${CYAN}→ Waiting for all nodes to be Ready...${NC}"
+  kubectl wait --for=condition=Ready nodes --all --context "${context}" --timeout=300s > /dev/null
+  echo -e "${GREEN}✓ Cilium is ready and all nodes are Ready.${NC}"
+}
+
 cmd_setup() {
   print_banner "${CYAN}" "🚀  Setting up Escape Room Cluster"
 
@@ -233,6 +259,9 @@ cmd_setup() {
   kubectl cluster-info --context "kind-${CLUSTER_NAME}" > /dev/null
   echo -e "${GREEN}✓ kubectl is connected to the cluster.${NC}"
 
+  check_not_kindnet
+  install_cilium
+
   init_state
 
   print_banner "${GREEN}" "✅  Setup complete — cluster is ready"
@@ -252,6 +281,22 @@ build_app_image() {
   docker build -q -t "${image}" "${app_dir}" > /dev/null
   kind load docker-image "${image}" --name "${CLUSTER_NAME}" > /dev/null
   echo -e "${GREEN}✓ Image loaded into the cluster.${NC}"
+}
+
+# Blocks until each deployment in "$@" rolls out (Ready pods), or exits 1 after 120s
+wait_for_deployments() {
+  local namespace="$1"
+  shift
+  local deployment
+  echo -e "${CYAN}→ Waiting for ${*} to be ready...${NC}"
+  for deployment in "$@"; do
+    if ! kubectl rollout status "deployment/${deployment}" -n "${namespace}" --timeout=120s > /dev/null 2>&1; then
+      echo -e "${RED}✗ Deployment '${deployment}' is not ready after 120s.${NC}"
+      echo -e "  Check: kubectl get pods -n ${namespace}"
+      exit 1
+    fi
+    echo -e "${GREEN}✓ ${deployment} is ready.${NC}"
+  done
 }
 
 # Deletes the namespaces of every level except "$1" so old workloads cannot interfere
@@ -313,6 +358,10 @@ cmd_start() {
   echo -e "${CYAN}→ Applying broken manifests...${NC}"
   kubectl apply -f "${broken_dir}/" -n "${namespace}"
   echo -e "${GREEN}✓ Broken state injected.${NC}"
+
+  if [[ "${level}" == "level-03" ]]; then
+    wait_for_deployments "${namespace}" backend frontend
+  fi
 
   # Update state
   init_state
