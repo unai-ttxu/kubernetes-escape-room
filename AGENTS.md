@@ -93,8 +93,9 @@ kubernetes-escape-room/
     │   ├── 02-milestone-02.md       # Session 2 log: Level 01 — The Ghost Image
     │   ├── 03-milestone-03.md       # Session 3 log: Level 02 — The Crashing Config
     │   └── 04-milestone-04.md       # Session 4 log: Level 03 — The Silent Wall
-    ├── ai-prompts-cheatsheet.md
-    └── pre-workshop-checklist.md
+    ├── ai-prompts-cheatsheet.md     # M5/M6 (coming soon)
+    ├── ai-research-notes.md         # M5 (coming soon)
+    └── pre-workshop-checklist.md    # M6 (coming soon)
 ```
 
 ---
