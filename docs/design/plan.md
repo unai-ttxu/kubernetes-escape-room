@@ -225,3 +225,7 @@ COMPLETED_LEVELS=
 ### Amendment 4 — Split M5 into M5 (AI practices) and M6 (docs)
 - **Change:** The original M5 (docs + cheatsheet) is split. M5 now covers AI-assisted troubleshooting best practices incl. MCP and CLI agents (opencode); the pre-workshop checklist and one-page cheatsheet move to M6.
 - **D4 extended, not replaced:** web copilots remain the baseline. MCP servers and CLI agents are optional, read-only by default, and scoped to the repo-local kubeconfig; setup stays outside the harness. Flagged for human review (rule 10).
+
+### Amendment 5 — Facilitator notes live in `docs/ai-exercises.md`, not `hints.md`
+- **Problem:** `extract_hint` in `scripts/escape-room.sh` prints everything between `## Hint N` headings, so notes appended to `hints.md` after Hint 3 would be shown to attendees.
+- **Decision:** M5 puts per-level bad/good prompts, expected findings and facilitator notes in a new instructor file, `docs/ai-exercises.md`. `scenarios/*/hints.md` and the harness are unchanged. Flagged for human review (rule 10).

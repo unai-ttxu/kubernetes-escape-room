@@ -92,9 +92,11 @@ kubernetes-escape-room/
     │   ├── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup
     │   ├── 02-milestone-02.md       # Session 2 log: Level 01 — The Ghost Image
     │   ├── 03-milestone-03.md       # Session 3 log: Level 02 — The Crashing Config
-    │   └── 04-milestone-04.md       # Session 4 log: Level 03 — The Silent Wall
-    ├── ai-prompts-cheatsheet.md     # M5/M6 (coming soon)
-    ├── ai-research-notes.md         # M5 (coming soon)
+    │   ├── 04-milestone-04.md       # Session 4 log: Level 03 — The Silent Wall
+    │   └── 05-milestone-05.md       # Session 5 log: AI-assisted troubleshooting best practices
+    ├── ai-prompts-cheatsheet.md     # AI workflow, bad vs good tips, guardrails (M5; M6 condenses)
+    ├── ai-exercises.md              # Instructor guide: bad vs good per level, challenge exercise (M5)
+    ├── ai-research-notes.md         # Cited sources, established vs emerging (M5)
     └── pre-workshop-checklist.md    # M6 (coming soon)
 ```
 
