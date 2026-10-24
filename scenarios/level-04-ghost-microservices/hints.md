@@ -30,11 +30,11 @@ kubectl logs -n escape-level-04 deployment/payment | grep -A 5 -E "ERROR|Excepti
 
 Read the exception message carefully:
 - Which payment method triggers the unhandled exception?
-- Which environment variable does the payment service expect to read, and why is its validator object `null`?
-- Inspect both the `payment` Deployment and its ConfigMap to compare the environment variable names:
+- What does the stack trace say is `null`, and where does that service get its runtime settings from?
+- Inspect how the `payment` workload is configured:
   ```bash
-  kubectl get deployment payment -n escape-level-04 -o yaml
-  kubectl get configmap payment-config -n escape-level-04 -o yaml
+  kubectl describe deployment payment -n escape-level-04
+  kubectl get events -n escape-level-04
   ```
 
 ## Hint 3: AI Copilot Prompt Recipe
@@ -63,6 +63,6 @@ All pods are Running 1/1 and standard card checkouts succeed, but coupon checkou
 
 [Goal]
 1. Explain why the exception occurs only for coupon checkouts while health checks and card payments pass.
-2. Quote the exact field in the Deployment or ConfigMap that causes the missing environment variable.
-3. Provide the minimal kubectl command or YAML patch to fix the configuration and roll out the updated payment pod.
+2. Quote the exact line in the stack trace and the exact manifest field that explain the root cause.
+3. Provide the minimal kubectl command or YAML patch to fix it and roll out the updated payment pod.
 ```

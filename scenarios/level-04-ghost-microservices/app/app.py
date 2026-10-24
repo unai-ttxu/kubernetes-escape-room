@@ -8,7 +8,7 @@ When `SERVICE_ROLE=payment`:
 - Standard health checks (`GET /healthz`) and non-coupon payment methods
   (`credit_card`, `debit_card`, `apple_pay`, `paypal`, `wallet`, `bank_transfer`)
   succeed with HTTP 200.
-- On startup, emits 5,000 lines of structured production log traffic. When
+- On startup, emits structured production log traffic (5,000 lines in the broken state). When
   `COUPON_VALIDATOR_URL` is missing from the environment, intermittent
   `payment_method=coupon` transactions buried inside those 5,000 lines log an
   unhandled `NullPointerException` stack trace, and live `"coupon"` requests
@@ -62,7 +62,7 @@ def format_npe_trace(tx_id, amount_cents):
 
 
 def emit_startup_logs(role, coupon_validator_url):
-    """Emit realistic startup log traffic (exactly 5,000 lines for `payment`)."""
+    """Emit realistic startup log traffic (5,000 lines for a broken `payment`)."""
     if role == "gateway":
         lines = [
             "2026-10-24T11:00:00.010Z INFO [main] GatewayServer — Starting checkout API gateway on :8080",
@@ -104,7 +104,7 @@ def emit_startup_logs(role, coupon_validator_url):
         sys.stdout.flush()
         return
 
-    # role == "payment": emit exactly 5,000 lines of log traffic.
+    # role == "payment": emit log traffic (5,000 lines when broken).
     # When broken, 3 intermittent coupon transactions (5 lines each = 15 lines)
     # are buried at indices 1250, 2750, and 4150 inside 4,985 INFO lines.
     coupon_state = "configured" if coupon_validator_url else "null"
@@ -133,7 +133,7 @@ def emit_startup_logs(role, coupon_validator_url):
                 f"— Flushed 40 settled authorizations to ledger batch_id=batch-{idx // 40:03d}"
             )
         else:
-            method = "coupon" if (coupon_validator_url and idx in error_indices) else STANDARD_METHODS[idx % len(STANDARD_METHODS)]
+            method = STANDARD_METHODS[idx % len(STANDARD_METHODS)]
             amount = 1500 + (idx % 17) * 250
             buffer.append(
                 f"2026-10-24T11:{minute:02d}:{second:02d}.210Z INFO [payment-worker-{(idx % 4) + 1}] PaymentProcessor "
@@ -203,7 +203,11 @@ class MicroserviceHandler(BaseHTTPRequestHandler):
 
         tx_id = str(payload.get("tx_id", "tx-live"))
         payment_method = str(payload.get("payment_method", "credit_card"))
-        amount_cents = int(payload.get("amount", 2500))
+        try:
+            amount_cents = int(payload.get("amount", 2500))
+        except (TypeError, ValueError):
+            self.send_json(400, {"status": "error", "message": "invalid amount"})
+            return
 
         if self.role == "gateway":
             if self.path not in ("/checkout", "/api/checkout", "/"):

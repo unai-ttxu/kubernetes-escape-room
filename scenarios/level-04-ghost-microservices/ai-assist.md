@@ -21,9 +21,8 @@ When pods are `Running 1/1` and failures are intermittent across a 3-tier micros
    - The upstream error lines from the caller tiers
    - The filtered exception stack trace from the origin service
    - The origin service's Deployment YAML and ConfigMap YAML
-   1. Quote the exact line in the stack trace that identifies the failing request type and the
-      missing runtime dependency.
-   2. Cross-reference that dependency against the Deployment and ConfigMap YAML and quote the
-      exact field that disagrees.
-   3. Give the minimal change that fixes the disagreement and ensures the running pod picks it up.
+   1. Quote the exact line in the stack trace that identifies the failing request type.
+   2. Cross-reference the stack trace against the Deployment and ConfigMap YAML and quote the
+      exact field that explains the failure.
+   3. Give the minimal change that fixes it and ensures the running pod picks it up.
    ```
