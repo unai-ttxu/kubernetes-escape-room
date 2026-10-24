@@ -3,3 +3,8 @@
 kubeconfig
 .DS_Store
 kind/.kube/
+__pycache__/
+*.py[cod]
+*.bak
+mcp-config.toml
+opencode.json
