@@ -1,7 +1,7 @@
 # Session 04 — Milestone 4: Level 03: "The Silent Wall"
 
 > **Date:** 2026-10-20  
-> **Status:** ✅ Completed & Merged  
+> **Status:** 🔍 In review (PR merged; human sign-off pending)  
 > **PR:** [#6](https://github.com/unai-ttxu/kubernetes-escape-room/pull/6) (`feat/M4`)
 
 ---
@@ -54,34 +54,36 @@ Implement Level 03 ("The Silent Wall") under [`scenarios/level-03-silent-wall/`]
 
 ## ✅ Verification & Smoke Test Lifecycle
 
-> Run on a kind cluster with Cilium (default kubeconfig emptied to prove the pinning) and reviewed/merged in PR #6.
+> Run on a kind cluster with Cilium (default kubeconfig emptied to prove the pinning). The review items below stay unticked until the human approves (AGENTS.md rules 17–18).
 
-Checks run:
+Checks that **were** run:
 
 - `shellcheck` clean on `scripts/escape-room.sh` and `scenarios/*/verify.sh`; `bash -n` OK.
 - All 14 level-03 manifests parse as YAML; each container has `requests` and `limits`; every object sets `namespace: escape-level-03` and `level: "03"`.
 - `setup` twice (idempotent): Cilium and Hubble up, nodes `Ready`; `kind/.kube/` is 700, `config` is 600. `cleanup` removes the cluster and `kind/.kube/`; `status` without the file prints the "run setup" hint.
 - Level 03: `verify` 1 broken, 0 after `solve`, 1 after `reset`; fixing only the Service port still fails `verify`.
 - After the final refactor (`wait_for_level_rollout`, kubeconfig error handling): level 03 `start`, `reset`, `verify`, `solve` and a level 01 `start` re-run OK.
-- Levels 01 and 02: `verify` 1 broken, 0 after `solve`, 1 after `reset`.
+- Levels 01 and 02: `verify` 1 broken, 0 after `solve`, 1 after `reset`. One level 02 `verify` immediately after `solve` failed once and passed on three repeats (not reproduced; possible timing flake).
 - `scripts/escape-room.sh` and the `verify.sh` files are mode `750` (AGENTS.md rule 7).
 
-Review checklist:
+Not run: the hint renderer (`./scripts/escape-room.sh hint`) on level 03, and a clean-machine `setup` (the pre-event gate).
 
-- [x] **Linting**: `shellcheck scenarios/level-03-silent-wall/verify.sh` clean.
-- [x] **Broken state**: `kubectl get ep -n escape-level-03` shows backend endpoints on port `8080`.
-- [x] **Broken state**: `kubectl get netpol -n escape-level-03 -o yaml` shows `role: api-consumer` vs. frontend pod label `role: web-frontend`.
-- [x] **Broken state**: frontend `/api/data` returns `504` / `502` while all pods are `Running 1/1`.
-- [x] **Verification failure**: `./scripts/escape-room.sh verify` exits `1` while broken.
-- [x] **Hints**: `./scripts/escape-room.sh hint` renders Hints 1–3.
-- [x] **Solution**: `./scripts/escape-room.sh solve` applies cleanly; both rollouts reach `1/1`.
-- [x] **Verification success**: `./scripts/escape-room.sh verify` exits `0` after `solve`.
-- [x] **Reset**: `./scripts/escape-room.sh reset` restores broken state and clears the completed mark.
-- [x] **Cilium setup**: `./scripts/escape-room.sh setup` creates the cluster, installs Cilium, and reports all nodes `Ready`.
-- [x] **NetworkPolicy enforced**: on the Cilium cluster, fixing only the port still fails verify (both bugs required).
+Checklist for the human reviewer:
+
+- [ ] **Linting**: `shellcheck scenarios/level-03-silent-wall/verify.sh` clean (not run: shellcheck not installed).
+- [ ] **Broken state**: `kubectl get ep -n escape-level-03` shows backend endpoints on port `8080`.
+- [ ] **Broken state**: `kubectl get netpol -n escape-level-03 -o yaml` shows `role: api-consumer` vs. frontend pod label `role: web-frontend`.
+- [ ] **Broken state**: frontend `/api/data` returns `504` / `502` while all pods are `Running 1/1`.
+- [ ] **Verification failure**: `./scripts/escape-room.sh verify` exits `1` while broken.
+- [ ] **Hints**: `./scripts/escape-room.sh hint` renders Hints 1–3.
+- [ ] **Solution**: `./scripts/escape-room.sh solve` applies cleanly; both rollouts reach `1/1`.
+- [ ] **Verification success**: `./scripts/escape-room.sh verify` exits `0` after `solve`.
+- [ ] **Reset**: `./scripts/escape-room.sh reset` restores broken state and clears the completed mark.
+- [ ] **Cilium setup**: `./scripts/escape-room.sh setup` creates the cluster, installs Cilium, and reports all nodes `Ready`.
+- [ ] **NetworkPolicy enforced**: on the Cilium cluster, fixing only the port still fails verify (both bugs required).
 
 ---
 
 ## ⏭️ Next Step
 
-Proceed to **Milestone 5**: AI-assisted troubleshooting best practices (workshop docs follow in Milestone 6).
+Human review of Milestone 4, including a decision on the NetworkPolicy/CNI gap and the kubectl context pinning. After approval, proceed to **Milestone 5**: AI-assisted troubleshooting best practices (workshop docs follow in Milestone 6).

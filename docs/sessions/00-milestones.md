@@ -54,7 +54,7 @@ M1: Core Harness & Cluster Setup
 
 ## Milestone 2 — Level 01: "The Ghost Image" (Warm-up)
 
-**Status:** ✅ Complete (PR #4 merged)  
+**Status:** 🔍 In review (PR #4 merged; human sign-off pending)  
 **Namespace:** `escape-level-01`  
 **Duration target:** 8–10 min
 
@@ -78,17 +78,17 @@ scenarios/level-01-ghost-image/
 3. `verify.sh` exits `0` on pass, `1` on fail
 
 **Review checklist (human must approve before M5 starts):**
-- [x] `broken/` manifests reproducibly cause `ImagePullBackOff`
-- [x] `solution/` applies cleanly and brings pod to `Running`
-- [x] `hints.md` has all 3 tiers (Conceptual → kubectl → AI Prompt)
-- [x] `verify.sh` runs idempotently from inside the cluster
-- [x] `incident.md` reads like a real pager alert
+- [ ] `broken/` manifests reproducibly cause `ImagePullBackOff`
+- [ ] `solution/` applies cleanly and brings pod to `Running`
+- [ ] `hints.md` has all 3 tiers (Conceptual → kubectl → AI Prompt)
+- [ ] `verify.sh` runs idempotently from inside the cluster
+- [ ] `incident.md` reads like a real pager alert
 
 ---
 
 ## Milestone 3 — Level 02: "The Crashing Config" (Core)
 
-**Status:** ✅ Complete (PR #5 merged)  
+**Status:** 🔍 In review (PR #5 merged; human sign-off pending)  
 **Namespace:** `escape-level-02`  
 **Duration target:** 12–15 min
 
@@ -115,16 +115,16 @@ scenarios/level-02-crashing-config/
 2. `http://order-processor.escape-level-02.svc.cluster.local:8080/healthz` → `{"status":"healthy","database":"connected"}`
 
 **Review checklist (human must approve before M5 starts):**
-- [x] App is self-contained (loadable into kind without pushing to external registry)
-- [x] `broken/` reliably shows both failure modes (key error in logs AND OOMKill)
-- [x] `solution/` fixes both bugs independently and together
-- [x] `verify.sh` waits for stable restart count before declaring success
+- [ ] App is self-contained (loadable into kind without pushing to external registry)
+- [ ] `broken/` reliably shows both failure modes (key error in logs AND OOMKill)
+- [ ] `solution/` fixes both bugs independently and together
+- [ ] `verify.sh` waits for stable restart count before declaring success
 
 ---
 
 ## Milestone 4 — Level 03: "The Silent Wall" (Boss Level)
 
-**Status:** ✅ Complete (PR #6 merged)  
+**Status:** 🔍 In review (PR #6 merged; human sign-off pending)  
 **Namespace:** `escape-level-03`  
 **Duration target:** 15–20 min
 
@@ -152,16 +152,16 @@ scenarios/level-03-silent-wall/
 2. Returns `HTTP 200` with body `{"data":"backend-connected"}`
 
 **Review checklist (human must approve before M5 starts):**
-- [x] `kubectl get ep -n escape-level-03` shows wrong port in broken state
-- [x] `kubectl get netpol -n escape-level-03 -o yaml` reveals label mismatch in broken state
-- [x] Both bugs must be fixed for `verify.sh` to pass
-- [x] `verify.sh` tests the full end-to-end path (not just individual services)
+- [ ] `kubectl get ep -n escape-level-03` shows wrong port in broken state
+- [ ] `kubectl get netpol -n escape-level-03 -o yaml` reveals label mismatch in broken state
+- [ ] Both bugs must be fixed for `verify.sh` to pass
+- [ ] `verify.sh` tests the full end-to-end path (not just individual services)
 
 ---
 
 ## Bonus — Level 04: "The Ghost in the Microservices"
 
-**Status:** ✅ Complete (PR #9 merged)  
+**Status:** 🔍 In review (PR #9 merged; human sign-off pending)  
 **Namespace:** `escape-level-04`  
 **Duration target:** 15–20 min (optional bonus)
 
@@ -185,16 +185,16 @@ scenarios/level-04-ghost-microservices/
 2. Detached probe pod sends 10 diverse synthetic `POST /checkout` transactions through `gateway` (including `credit_card`, `debit_card`, `apple_pay`, `paypal`, `wallet`, `bank_transfer`, and `coupon`); all 10 return `HTTP 200` with `"payment":"approved"`
 
 **Review checklist (human must approve):**
-- [x] App is self-contained (built and loaded into kind by `start level-04` without external registry)
-- [x] `payment` emits 5,000 log lines with the `"coupon"` `NullPointerException` buried inside standard log traffic
-- [x] Standard healthchecks and non-coupon transactions pass in the broken state while `"coupon"` returns `HTTP 500`
-- [x] `verify.sh` fails in the broken state, passes after `solve`, and fails again after `reset`
+- [ ] App is self-contained (built and loaded into kind by `start level-04` without external registry)
+- [ ] `payment` emits 5,000 log lines with the `"coupon"` `NullPointerException` buried inside standard log traffic
+- [ ] Standard healthchecks and non-coupon transactions pass in the broken state while `"coupon"` returns `HTTP 500`
+- [ ] `verify.sh` fails in the broken state, passes after `solve`, and fails again after `reset`
 
 ---
 
 ## Milestone 5 — AI-Assisted Troubleshooting Best Practices
 
-**Status:** ✅ Complete (PR #8 merged)  
+**Status:** 🔍 In review (PR #8 merged; human sign-off pending)  
 **Depends on:** M1–M4 complete (or near-complete)
 
 **Goal:** Teach a repeatable, evidence-based way to use LLMs during an incident, from web copilots up to tool-connected workflows (MCP, CLI agents such as opencode). Web copilots remain the baseline (D1/D4); MCP and CLI agents are **optional** and must not be assumed available.
@@ -225,12 +225,12 @@ scenarios/*/ai-assist.md        # Attendee AI tip per level, shown by `./scripts
 - Any harness change updates `AGENTS.md` (rule 8); design changes go in `docs/design/plan.md` (rule 10)
 
 **Review checklist (human must approve before M6 starts):**
-- [x] All cited links resolve and dates are accurate
-- [x] Established practices are clearly separated from emerging ideas
-- [x] The challenge-the-hypothesis exercise has facilitator notes and expected findings
-- [x] Guardrails section covers all six rules above
-- [x] MCP / opencode steps were tested, or are explicitly flagged as untested
-- [x] Workflow is coherent with the existing level hints (Concept → Investigation → AI prompt)
+- [ ] All cited links resolve and dates are accurate
+- [ ] Established practices are clearly separated from emerging ideas
+- [ ] The challenge-the-hypothesis exercise has facilitator notes and expected findings
+- [ ] Guardrails section covers all six rules above
+- [ ] MCP / opencode steps were tested, or are explicitly flagged as untested
+- [ ] Workflow is coherent with the existing level hints (Concept → Investigation → AI prompt)
 
 ---
 

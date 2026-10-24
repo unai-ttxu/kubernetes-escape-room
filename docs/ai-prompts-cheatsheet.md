@@ -123,7 +123,7 @@ An MCP server lets the assistant call cluster tools itself instead of you copy-p
   - **Keep Secrets out of reach (`[[denied_resources]]`).** Block `v1/Secret` via GVK table entries, **but do not block `v1/ConfigMap`** (Levels 02 and 04 require inspecting `ConfigMap/order-config` and `ConfigMap/payment-config`).
   - Option names differ per server and version; check its README. See [`ai-research-notes.md`](ai-research-notes.md) (M1).
 
-Verified TOML configuration for `containers/kubernetes-mcp-server` (e.g., save as `mcp-config.toml` and pass via `--config mcp-config.toml` from the repository root):
+Verified TOML configuration for `containers/kubernetes-mcp-server` (e.g., save as `mcp-config.toml` and pass via `--config mcp-config.toml` from the repository root; the file is gitignored and local-only, do not commit it):
 ```toml
 # Strict read-only inspection profile scoped to the workshop cluster
 read_only = true
@@ -160,7 +160,7 @@ Agents run commands for you in a loop. Same rules, tool-agnostic:
 - **Read every command before approving.** Check the namespace and the context. Watch for pipes, `;`, `&&` and `xargs`.
 - **Set `KUBECONFIG=kind/.kube/config`** before launching the agent, so it can only reach the workshop cluster.
 - **Review the diff, not the story.** The agent's summary is not the evidence; the command output is.
-- Verified permission policy shapes for `opencode` (`opencode.json`; rule order matters — last matching rule wins, so catch-all `"*"` goes first and `deny` rules go last):
+- Verified permission policy shapes for `opencode` (`opencode.json`, gitignored and local-only; rule order matters — last matching rule wins, so catch-all `"*"` goes first and `deny` rules go last):
   ```json
   {
     "$schema": "https://opencode.ai/config.json",

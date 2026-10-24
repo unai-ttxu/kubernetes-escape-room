@@ -377,9 +377,6 @@ The human (repo owner) must review and explicitly approve before an agent procee
 kubeconfig
 .DS_Store
 kind/.kube/
-__pycache__/
-*.py[cod]
-*.bak
 mcp-config.toml
 opencode.json
 ```

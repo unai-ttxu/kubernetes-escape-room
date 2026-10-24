@@ -196,7 +196,7 @@ COMPLETED_LEVELS=
 
 ### Amendment 1 — Level 01 review hardening (M2)
 
-*Reviewed and approved in PR #4.*
+*Merged in PR #4; flagged for human review (rule 10).*
 
 - **Readiness check:** `verify.sh` uses `kubectl rollout status` instead of reading `items[0]` of the pod list, which was unreliable during rollouts (stale `ImagePullBackOff` pod from the old ReplicaSet).
 - **Image pinning:** the Level 01 solution uses `nginx:1.27-alpine` (was `nginx:alpine`) and the verify probe uses `curlimages/curl:8.11.1` (was `latest`), in line with the "pinned digests or well-known tags" constraint.
@@ -207,7 +207,7 @@ COMPLETED_LEVELS=
 
 ### Amendment 2 — Level 02 design details (M3)
 
-*Reviewed and approved in PR #5.*
+*Merged in PR #5; flagged for human review (rule 10).*
 
 - **Config injection:** the Deployment uses `envFrom: configMapRef` (not `configMapKeyRef`). With a `configMapKeyRef` and a missing key, Kubernetes never starts the container (`CreateContainerConfigError`), so the `KeyError: 'DATABASE_URL'` in the app logs described in the plan could not occur.
 - **Both bugs visible in the broken state:** the app checks `DATABASE_URL` first and logs the `KeyError`, then warms a 32MiB cache, and only then exits `1`. At `16Mi` the kernel OOM-kills it during the warm-up (Exit Code 137), so logs show the config error while `describe` shows `OOMKilled`. Fixing either bug alone exposes the other (verified).
@@ -218,7 +218,7 @@ COMPLETED_LEVELS=
 
 ### Amendment 3 — Cilium CNI for NetworkPolicy enforcement (M4)
 
-*Reviewed and approved in PR #6.*
+*Merged in PR #6; flagged for human review (rule 10).*
 
 - **Problem:** kind's default CNI (kindnet) does not enforce NetworkPolicy, so the Level 03 policy fault would not block traffic.
 - **Decision:** the cluster is created with `networking.disableDefaultCNI: true`, and `setup` installs Cilium 1.20.2 from a pinned manifest, `kind/cni/cilium.yaml` (rendered with helm, no helm at runtime). kube-proxy is kept (`kubeProxyReplacement=false`), with Kubernetes IPAM and Envoy disabled to limit image pulls. Hubble, Hubble Relay and the Hubble UI are enabled so attendees and instructors can observe dropped flows.
@@ -230,21 +230,21 @@ COMPLETED_LEVELS=
 
 ### Amendment 4 — Split M5 into M5 (AI practices) and M6 (docs)
 
-*Reviewed and approved in PR #7.*
+*Merged in PR #7; flagged for human review (rule 10).*
 
 - **Change:** The original M5 (docs + cheatsheet) is split. M5 now covers AI-assisted troubleshooting best practices incl. MCP and CLI agents (opencode); the pre-workshop checklist and one-page cheatsheet move to M6.
 - **D4 extended, not replaced:** web copilots remain the baseline. MCP servers and CLI agents are optional, read-only by default, and scoped to the repo-local kubeconfig; setup stays outside the harness.
 
 ### Amendment 5 — Facilitator notes in `docs/ai-exercises.md` and `ai-assist` command
 
-*Reviewed and approved in PR #8.*
+*Merged in PR #8; flagged for human review (rule 10).*
 
 - **Problem:** `extract_hint` in `scripts/escape-room.sh` prints everything between `## Hint N` headings, so notes appended to `hints.md` after Hint 3 would be shown to attendees.
 - **Decision:** M5 puts per-level bad/good prompts, expected findings and facilitator notes in a new instructor file, `docs/ai-exercises.md`, and adds attendee-facing AI tips in `scenarios/*/ai-assist.md` shown by `./scripts/escape-room.sh ai-assist` (independent of `HINT_LEVEL`). `scenarios/*/hints.md` is unchanged.
 
 ### Amendment 6 — Level 04 design details ("The Ghost in the Microservices")
 
-*Reviewed and approved in PR #9.*
+*Merged in PR #9; flagged for human review (rule 10).*
 
 - **Single self-contained image:** `scenarios/level-04-ghost-microservices/app/` builds `escape-room/level-04-app:1.0.0` (`python:3.12-alpine3.20`, stdlib only) and runs as `gateway`, `cart`, or `payment` via the `SERVICE_ROLE` environment variable.
 - **5,000-line log haystack & configuration bug:** On startup, `payment` emits 5,000 lines of structured checkout logs. In `broken/payment-deployment.yaml`, the container environment variable is mapped as `COUPON_VALIDATOR_URI` instead of `COUPON_VALIDATOR_URL` (referencing `ConfigMap/payment-config` key `COUPON_VALIDATOR_URL`). Health checks (`/healthz`) and non-coupon payments succeed, while `"coupon"` checkouts log an unhandled `NullPointerException` stack trace (buried inside the 5,000 lines and emitted on live `"coupon"` requests) and return `HTTP 500` cascading through `cart` and `gateway`.

@@ -1,7 +1,7 @@
 # Session 02 — Milestone 2: Level 01: "The Ghost Image"
 
 > **Date:** 2026-10-18  
-> **Status:** ✅ Completed & Merged  
+> **Status:** 🔍 In review (PR merged; human sign-off pending)  
 > **PR:** [#4](https://github.com/unai-ttxu/kubernetes-escape-room/pull/4) (`feat/M2`)  
 
 ---
@@ -58,15 +58,15 @@ Implement Level 01 ("The Ghost Image") under `scenarios/level-01-ghost-image/` t
 
 ## ✅ Verification & Smoke Test Lifecycle
 
-> End-to-end smoke test passed on a local Kind cluster (start → verify 1 → hints 1–3 → solve → verify 0 ×3 → reset → verify 1; completed mark cleared on reset; no leaked probe pods) and reviewed/merged in PR #4.
+> An agent-run end-to-end smoke test passed on a local Kind cluster (start → verify 1 → hints 1–3 → solve → verify 0 ×3 → reset → verify 1; completed mark cleared on reset; no leaked probe pods). Items stay unticked until the human reviewer confirms.
 
-- [x] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings.
-- [x] **Broken State**: `./scripts/escape-room.sh start level-01` injected broken manifests; pods reliably entered `ImagePullBackOff`.
-- [x] **Verification Failure**: `./scripts/escape-room.sh verify` exited with code `1` while broken.
-- [x] **Hint Parsing**: `./scripts/escape-room.sh hint` properly parsed and rendered Hints 1, 2, and 3 sequentially, warning on 4th invocation.
-- [x] **Solution Rollout**: `./scripts/escape-room.sh solve` applied reference fix; deployment rolled out cleanly to `Running 1/1`.
-- [x] **Verification Success**: `./scripts/escape-room.sh verify` passed with code `0` and rendered the celebration banner.
-- [x] **Reset Idempotency**: `./scripts/escape-room.sh reset` restored broken state; subsequent verify failed as expected.
+- [ ] **Linting**: `shellcheck scenarios/level-01-ghost-image/verify.sh scripts/escape-room.sh` passed with 0 errors/warnings.
+- [ ] **Broken State**: `./scripts/escape-room.sh start level-01` injected broken manifests; pods reliably entered `ImagePullBackOff`.
+- [ ] **Verification Failure**: `./scripts/escape-room.sh verify` exited with code `1` while broken.
+- [ ] **Hint Parsing**: `./scripts/escape-room.sh hint` properly parsed and rendered Hints 1, 2, and 3 sequentially, warning on 4th invocation.
+- [ ] **Solution Rollout**: `./scripts/escape-room.sh solve` applied reference fix; deployment rolled out cleanly to `Running 1/1`.
+- [ ] **Verification Success**: `./scripts/escape-room.sh verify` passed with code `0` and rendered the celebration banner.
+- [ ] **Reset Idempotency**: `./scripts/escape-room.sh reset` restored broken state; subsequent verify failed as expected.
 
 ---
 
