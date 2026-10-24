@@ -76,12 +76,14 @@ kubernetes-escape-room/
 │   │   ├── solution/
 │   │   ├── incident.md
 │   │   ├── hints.md
+│   │   ├── ai-assist.md
 │   │   └── verify.sh
 │   ├── level-03-silent-wall/
 │   │   ├── broken/
 │   │   ├── solution/
 │   │   ├── incident.md
 │   │   ├── hints.md
+│   │   ├── ai-assist.md
 │   │   └── verify.sh
 │   └── level-04-ghost-microservices/  # Optional bonus
 │       └── ...

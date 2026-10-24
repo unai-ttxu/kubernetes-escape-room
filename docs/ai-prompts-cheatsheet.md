@@ -135,7 +135,7 @@ Generic client entry (adapt command and options to the server you pick; relative
   }
 }
 ```
-> Check how your server resolves the kubeconfig. At least one popular server documents that `$KUBECONFIG` is *not* a server option and takes a `kubeconfig` setting in its own config file instead. A wrong guess could silently fall back to your default context.
+> Check how your server resolves options and the kubeconfig (e.g. `<server> --help`). For example, `containers/kubernetes-mcp-server` takes `--config <file.toml>` with TOML keys (`read_only = true`, `disable_destructive = true`, `kubeconfig = "kind/.kube/config"`) and documents that `$KUBECONFIG` is *not* a server option. A wrong guess could silently fall back to your default context or leave write tools enabled.
 
 ### d) CLI agents (opencode, kubectl-ai, Claude Code, and similar)
 Agents run commands for you in a loop. Same rules, tool-agnostic:

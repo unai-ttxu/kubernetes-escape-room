@@ -49,8 +49,8 @@ Useful, widely discussed, but tool- and version-dependent. Presented as optional
 ## How to re-verify before the event
 
 ```bash
-# every URL above should return 200
-for u in $(grep -oE 'https://[^) >]+' docs/ai-research-notes.md | sort -u); do
+# every URL above should return 200 (OWASP may return 403 to curl due to Cloudflare; verify in browser)
+for u in $(grep -oE 'https://[a-zA-Z0-9][^) >]+' docs/ai-research-notes.md | sort -u); do
   printf '%s %s\n' "$(curl -s -o /dev/null -L -w '%{http_code}' "$u")" "$u"
 done
 ```

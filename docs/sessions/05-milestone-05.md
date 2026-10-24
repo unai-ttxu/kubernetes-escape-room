@@ -21,6 +21,7 @@ Teach a repeatable, evidence-based way to use AI during an incident, using the t
 | `docs/ai-research-notes.md` | Cited sources with access dates; established vs emerging; unverified items; source conflicts |
 | `scenarios/*/ai-assist.md` | One attendee-facing AI tip per level (bad vs good, no fix) |
 | `scripts/escape-room.sh` | New `ai-assist` command: prints the current level's `ai-assist.md`; does not touch `HINT_LEVEL`; listed in `start` and usage |
+| `scenarios/level-03-silent-wall/incident.md`, `hints.md` | Updated gateway error wording from `502` to `504` / `502` to match observed Cilium behaviour |
 | `README.md`, `AGENTS.md` | Directory trees, command list and harness behaviour updated (rules 8, 16) |
 | `docs/sessions/00-milestones.md` | M5 status set to 🔍 In review; deliverables list updated; checklist **not** ticked (rule 17) |
 | `docs/design/plan.md` | Amendment 5 (facilitator notes outside `hints.md`) |
@@ -55,9 +56,9 @@ Checks that were **not** run:
 - `kubectl-ai`, `kubernetes-mcp-server` and opencode details come from fetched pages, not from running the tools.
 - Link check and path check: see the commands in the review checklist below.
 
-### Finding for the repo owner (not changed here)
+### Level 03 symptom note (`504` vs `502`)
 
-`incident.md` and `hints.md` for Level 03 say the frontend returns `502`. In the initial broken state the NetworkPolicy drops packets and the frontend returns **504**; `502` appears only after the policy is fixed. The exercise guide says so. Decide whether to update the scenario text (it is outside M5's scope).
+In the initial broken state, the `NetworkPolicy` drops packets and the frontend returns **`504`** (`upstream timed out`); **`502`** (`Connection refused`) appears once the policy is fixed while the `targetPort` mismatch remains. `scenarios/level-03-silent-wall/incident.md` and `hints.md` were updated to mention `504` / `502` so they match both stages.
 
 ### Environment note
 
@@ -67,7 +68,7 @@ The first `setup` found an old `escape-room` kind cluster whose only node had th
 
 ## Review checklist for the human reviewer
 
-- [ ] All cited links resolve and dates are accurate (`for u in $(grep -oE 'https://[^) >]+' docs/ai-research-notes.md | sort -u); do curl -s -o /dev/null -L -w '%{http_code} ' "$u"; echo "$u"; done`)
+- [ ] All cited links resolve and dates are accurate (`for u in $(grep -oE 'https://[a-zA-Z0-9][^) >]+' docs/ai-research-notes.md | sort -u); do curl -s -o /dev/null -L -w '%{http_code} ' "$u"; echo "$u"; done`)
 - [ ] Established practices are clearly separated from emerging ideas
 - [ ] The challenge-the-hypothesis exercise has facilitator notes and expected findings
 - [ ] Guardrails section covers all six rules

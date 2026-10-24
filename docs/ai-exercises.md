@@ -117,7 +117,7 @@ $ frontend access log / error log (excerpt)
 $ DNS from a pod in the namespace
 10.11.142.156  backend-service.escape-level-03.svc.cluster.local     # resolves fine
 ```
-**Heads-up (scenario text vs. reality):** `incident.md` and `hints.md` say `502`. In the initial broken state we observed **504** (the NetworkPolicy drops the packets, so the proxy times out). A `502`-style refusal appears only after the policy is fixed and the port mismatch remains. Both are the same faults; just do not tell attendees "you must see a 502". Logged in the session log for the owner to decide whether the scenario text should change.
+**Symptom progression (`504` → `502`):** In the initial broken state, the `NetworkPolicy` drops packets silently, so the frontend proxy times out and returns **`504`**. A **`502`** (`Connection refused`) appears after the policy is fixed while the `targetPort` mismatch remains. `incident.md` and `hints.md` mention `504` / `502` to cover both stages.
 
 ### 🚫 Bad prompt
 ```text
