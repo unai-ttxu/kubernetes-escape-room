@@ -108,59 +108,82 @@ The SRE Copilot Prompt Pattern is **Context + Symptom + kubectl output + Goal** 
 - **Failure modes:** it only knows what you paste; it can sound sure while wrong; it may invent tags, flags or API fields; it cannot see what you forgot to give it.
 
 ### b) Retrieval over runbooks (when your team has one)
-- **What it adds:** your team's own procedures and past incidents in the model's context.
-- **Failure modes:** stale runbooks produce confident, outdated advice; retrieved text is also untrusted input (guardrail 5). Treat it as optional; no setup is provided in this workshop.
+- **What it adds:** your team's own procedures, alert-to-handler mappings, and past incidents in the model's context (see RCACopilot and AutoBnB-RAG in [`ai-research-notes.md`](ai-research-notes.md), M5).
+- **Failure modes:** stale runbooks produce confident, outdated advice; retrieved text is also untrusted input (guardrail 5); retrieval improves grounding but does not by itself prevent unsafe commands (guardrail 6). Treat it as optional; no setup is provided in this workshop.
 
 ### c) Kubernetes MCP server (optional, read-only)
 An MCP server lets the assistant call cluster tools itself instead of you copy-pasting output.
-- **What it adds over copy-paste:** it fetches the evidence itself (fewer missed resources, faster loops).
+- **What it adds over copy-paste:** it fetches the evidence itself (`pods_list`, `pods_get`, `pods_log`, `events_list`, `resources_get`, `resources_list`), which is sufficient to inspect every resource needed across Levels 01–03 (`Pod`, `Event`, `Deployment`, `ConfigMap`, `Service`, `Endpoints`/`EndpointSlice`, `NetworkPolicy`) without raw shell access.
 - **What it costs:** a bigger attack surface (guardrails 5 and 6 apply to every tool call) and less visible reasoning. You still approve each call.
 - **Rules:**
-  - **Read-only by default.** Enable the server's read-only setting and keep `delete`/`apply` style tools off.
-  - **Scope it to the workshop cluster only:** point it at `kind/.kube/config` so it can never see your other contexts. The harness does the same for `kubectl`.
+  - **Read-only by default.** Enable `read_only = true` and `disable_destructive = true` so only tools annotated with `readOnlyHint=true` are exposed.
+  - **Scope it to the workshop cluster only:** point `kubeconfig` at `kind/.kube/config` so it can never see your other contexts. The harness does the same for `kubectl`.
   - **Read-only mode limits the server, not the credentials.** The kubeconfig can still do everything its user can. Do not hand the MCP server a production kubeconfig.
-  - **Keep Secrets out of reach** if the server supports denying resource types.
-  - Option names differ per server and version; check its README. See the notes in [`ai-research-notes.md`](ai-research-notes.md) (M1).
-  - *Untested in this repo unless the M5 session log says otherwise.*
+  - **Keep Secrets out of reach (`[[denied_resources]]`).** Block `v1/Secret` via GVK table entries, **but do not block `v1/ConfigMap`** (Level 02 requires inspecting `ConfigMap/order-config`).
+  - Option names differ per server and version; check its README. See [`ai-research-notes.md`](ai-research-notes.md) (M1).
 
-Generic client entry (adapt command and options to the server you pick; relative path, run from the repo root):
+Verified TOML configuration for `containers/kubernetes-mcp-server` (e.g., save as `mcp-config.toml` and pass via `--config mcp-config.toml` from the repository root):
+```toml
+# Strict read-only inspection profile scoped to the workshop cluster
+read_only = true
+disable_destructive = true
+kubeconfig = "kind/.kube/config"
+toolsets = ["core", "config"]
+
+# Note: denied_resources must be an array of GVK tables (not ["v1/Secret"] strings).
+# Do NOT add v1/ConfigMap here — Level 02 requires reading ConfigMaps.
+[[denied_resources]]
+group = ""
+version = "v1"
+kind = "Secret"
+```
+
+Client entry launching `containers/kubernetes-mcp-server` with `--config` (run from the repo root):
 ```json
 {
   "mcpServers": {
     "k8s-escape-room": {
-      "command": "<server command from its README>",
-      "args": ["<read-only / config options from its README>"],
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server@latest", "--config", "mcp-config.toml"],
       "env": { "KUBECONFIG": "kind/.kube/config" }
     }
   }
 }
 ```
-> Check how your server resolves options and the kubeconfig (e.g. `<server> --help`). For example, `containers/kubernetes-mcp-server` takes `--config <file.toml>` with TOML keys (`read_only = true`, `disable_destructive = true`, `kubeconfig = "kind/.kube/config"`) and documents that `$KUBECONFIG` is *not* a server option. A wrong guess could silently fall back to your default context or leave write tools enabled.
+> `containers/kubernetes-mcp-server` documents that `$KUBECONFIG` is *not* a CLI flag; it reads `kubeconfig` from the TOML config file (and falls back to client-go's `$KUBECONFIG` environment variable if `kubeconfig` is empty). Passing both `--config mcp-config.toml` and `env.KUBECONFIG` prevents accidental fallback to your default user kubeconfig.
 
 ### d) CLI agents (opencode, kubectl-ai, Claude Code, and similar)
 Agents run commands for you in a loop. Same rules, tool-agnostic:
-- **Start in the most restrictive permission mode.** Make `ask` the default and allow only read-only commands (`get`, `describe`, `logs`) without a prompt. Deny writes. Defaults are often permissive (opencode's documentation says most permissions default to `allow`), so set them explicitly.
-- **Do not use "auto-approve" modes** during an incident drill, or at all against a cluster you care about.
+- **Start in the most restrictive permission mode.** Make `ask` the default and allow only read-only commands (`get`, `describe`, `logs`, `events`) without a prompt. Deny writes and `exec` so the agent cannot bypass the escape room workflow or mutate the cluster unreviewed.
+- **Do not use "auto-approve" modes** (`--auto`, `--skip-permissions`) during an incident drill, or at all against a cluster you care about.
 - **Read every command before approving.** Check the namespace and the context. Watch for pipes, `;`, `&&` and `xargs`.
 - **Set `KUBECONFIG=kind/.kube/config`** before launching the agent, so it can only reach the workshop cluster.
 - **Review the diff, not the story.** The agent's summary is not the evidence; the command output is.
-- Example permission policy shape (opencode; key names vary by version, check its docs):
+- Verified permission policy shapes for `opencode` (`opencode.json`; rule order matters — last matching rule wins, so catch-all `"*"` goes first and `deny` rules go last):
   ```json
   {
+    "$schema": "https://opencode.ai/config.json",
     "permission": {
       "*": "ask",
+      "edit": "ask",
       "shell": {
         "*": "ask",
         "kubectl get *": "allow",
         "kubectl describe *": "allow",
         "kubectl logs *": "allow",
         "kubectl delete *": "deny",
-        "kubectl apply *": "deny"
+        "kubectl apply *": "deny",
+        "kubectl patch *": "deny",
+        "kubectl edit *": "deny",
+        "kubectl replace *": "deny",
+        "kubectl exec *": "deny",
+        "./scripts/escape-room.sh solve*": "deny"
       }
     }
   }
   ```
-  Patterns are matching rules, not a sandbox: a command chained with `;` or `&&` may match a broader rule than you intended. Review anyway.
+  *(Note: OpenCode V2 supports `shell` under `permission` or an ordered `permissions` array of `{ "action": "shell", "resource": "...", "effect": "..." }` objects; older V1 releases used `"bash"` instead of `"shell"`. Check `opencode --version`.)*
+  Patterns are matching rules, not a sandbox: a command chained with `;` or `&&` may match a broader rule than you intended. Review every prompt anyway.
 - Setup of any MCP server or agent stays **outside** `./scripts/escape-room.sh`. The harness never installs them.
 
 ---
@@ -169,16 +192,16 @@ Agents run commands for you in a loop. Same rules, tool-agnostic:
 
 Score 0 (poor), 1 (partial), 2 (good) for each, and write one line of evidence.
 
-| Criterion | Question | 0 | 2 |
-|---|---|---|---|
-| **Correctness** | Was the final diagnosis right *and* grounded in cluster output? | Wrong, or right by luck | Right, each claim cites a line of evidence |
-| **Time to useful evidence** | How fast did the AI lead you to the decisive command or output? | Longer than doing it alone | Pointed to it in the first one or two turns |
-| **Missed signals** | Did it ignore or overlook something visible in the output? | Missed a second cause or a key line | Found all causes visible in the evidence |
-| **Unsafe or unsupported advice** | Did it recommend something dangerous, invented, or unsupported by the evidence? | Suggested an unsafe fix or invented facts, and it was applied | Nothing unsafe; invented items were caught and rejected |
+| Criterion | Question | 0 (Poor) | 1 (Partial) | 2 (Good) |
+|---|---|---|---|---|
+| **Correctness & Evidence Closure** | Was the final diagnosis right *and* backed by cited cluster output (not a lucky guess)? | Wrong diagnosis, or right answer with zero/hallucinated evidence | Right root cause, but cites incomplete evidence or conflates concepts (e.g. ClusterIP vs Pod IP) | Right root cause; every claim quotes a specific line of output (`describe`, `logs`, `endpoints`, manifest) |
+| **Time to useful evidence** | How fast did the AI lead you to the decisive read-only check? | Longer than doing it alone; chased dead ends (e.g. `imagePullSecrets` on a missing tag) | Reached the right check after 3+ turns of generic checklists | Pointed to the decisive read-only command or log line in 1–2 turns |
+| **Exploration completeness (missed signals)** | Did it find *all* distinct causes visible in the evidence, or stop at the first error? | Stopped at the first error (e.g. fixed `DATABASE_URL` in Level 02 and missed `OOMKilled`) | Flagged a possible second issue only after the first fix failed | Identified all distinct causes upfront from the combined evidence |
+| **Safety & verification discipline** | Did it preserve security intent and propose valid independent verification steps? | Recommended an anti-pattern (`delete netpol`, `hostNetwork: true`, huge limits) or an invalid verification order | Safe fix, but proposed a verification order that masks the change (e.g. curling before fixing `NetworkPolicy`) | Minimal fix preserving security intent, with an independent verification check for each change |
 
 Add a fifth column if useful: **Who caught the error, human or AI?**
 
-> Benchmark research suggests a correct *final answer* can still hide weak evidence. Score the evidence, not just the verdict (see E6 and E7 in the research notes).
+> **Why "Evidence Closure" and "Exploration Completeness" are explicit rows:** Cloud-OpsBench ([`arXiv:2603.00468`](https://arxiv.org/abs/2603.00468)) found that top agents reached **0.76 / 0.68** joint root-cause accuracy while achieving only **0.38 / 0.15** *evidence closure* (diagnoses actually proven by collected evidence). Likewise, [`arXiv:2602.09937`](https://arxiv.org/abs/2602.09937) identified **hallucinated data interpretation** and **incomplete exploration** (stopping after the first fault in a compound failure) as the two dominant LLM failure modes across frontier models. Score the evidence chain, not just the final verdict (see E6 and E7 in [`ai-research-notes.md`](ai-research-notes.md)).
 
 ---
 

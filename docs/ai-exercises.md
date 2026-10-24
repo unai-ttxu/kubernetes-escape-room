@@ -11,7 +11,21 @@
 3. **Round B, "good":** they collect the listed evidence, use the *good* prompt and compare.
 4. Debrief with the rubric (cheatsheet section 5).
 
-**Important caveat:** model answers vary by model, version and day. This guide lists the **classes of answers** to expect, not exact text. The "observed in the cluster" blocks are real output from a fresh kind cluster, captured while writing this guide (2026-10-23). The "expected AI behavior" lines were **not** measured against any model; they are patterns consistent with the failure modes in [research notes E6/E7](ai-research-notes.md), and should be confirmed in a dry run (see the M5 session log).
+**Methodology & Caveat:** Model answers vary by model tier, version and day. The "observed in the cluster" blocks are real output from a fresh kind + Cilium cluster (captured 2026-10-23). The "Observed AI behavior" notes and the **Model Evaluation Matrix** below were empirically validated (2026-10-24) across two distinct model tiers (**Gemini Flash-Lite** and **Gemini Pro**) in zero-context sessions using only the pasted prompt text.
+
+---
+
+## Empirical Model Evaluation Matrix (Levels 01–03)
+
+| Prompt / Scenario | Gemini Flash-Lite (Fast / Lightweight Tier) | Gemini Pro (Frontier Reasoning Tier) | Key Drift & Facilitator Takeaway |
+|---|---|---|---|
+| **L01 Bad** (`My pod is stuck in ImagePullBackOff, what do I do?`) | Generic 3-step checklist (`describe pod`, check tag existence, check typos and `imagePullSecrets`). | Generic 3-branch checklist separating `NotFound`, `401/403` (`imagePullSecrets`), and `i/o timeout` (network/DNS). | Without `Events`, both models must guess across all 3 failure classes; attendees waste time checking registry auth. |
+| **L01 Good** (Full `describe pod` Events + negative constraint on inventing tags) | Quotes `code = NotFound ... nginx:1.27.99-alpine: not found`; rules out auth (403) and network (timeout); suggests `skopeo list-tags` or Docker Hub. | Quotes exact `NotFound` event; separates from 401/403 and timeout; provides Docker Hub v2 tags API `curl` command and `skopeo list-tags`. | Negative constraint (`Do not invent a replacement tag`) prevented both models from hallucinating a tag; both pointed to registry inspection. |
+| **L02 Bad** (Pasting `kubectl logs` only: `KeyError` + `warming 32MiB`) | **Hyperfocuses 100% on `KeyError: 'DATABASE_URL'`**; completely misses the `OOMKilled` termination. | Diagnoses `DATABASE_URL` (with placeholder `<configmap-name>`), **and** spots `warming 32MiB order cache` as a clue to check `describe pod` for Exit 137 (`OOMKilled`). | Confirming [arXiv:2602.09937](https://arxiv.org/abs/2602.09937) (E7): smaller/faster models stop at the first log error; even frontier models cannot see `16Mi` or `DB_CONNECTION_STRING` without `describe` + `ConfigMap`. |
+| **L02 Good** (`logs` + `describe` + `ConfigMap`, ask for all causes & order) | Identifies both causes (`KeyError` vs `DB_CONNECTION_STRING` and `OOMKilled` Exit 137 at `16Mi` vs `32MiB`). Orders **ConfigMap first, Memory second** (`64Mi`). | Identifies both causes with exact quotes. Orders **Memory first (`64Mi`), ConfigMap second**, and asks for `logs --previous` + probe specs to rule out probe kills. | **Order drift:** Fixing ConfigMap first removes `KeyError` from logs while the pod still OOMs; fixing Memory first lets the app survive cache warming and exit `1` cleanly on config. Both work if verified step-by-step. |
+| **L03 Bad** (`backend-service` YAML only) | Lists 3 unverified possibilities: pod label mismatch, `targetPort: 8080` mismatch, or `NetworkPolicy` blocking traffic. | States Service YAML alone is insufficient; lists 4 hypotheses (selector, `targetPort`, `NetworkPolicy`, client DNS) and the `kubectl` commands to check each. | Single-resource prompts force guesswork. Impatient follow-ups ("just give me a quick fix") trigger unsafe advice (`kubectl delete netpol`, `hostNetwork: true`). |
+| **L03 Good** (Endpoints + Service + Deployment ports + NetPol + pod labels) | Finds both disagreements (`8080` vs `9000`; `role: api-consumer` vs `role: web-frontend`) and keeps security intent, **but proposes curling `backend-service` after fixing only `targetPort`**. | Finds both disagreements, keeps security intent, verifies `targetPort` via `kubectl get endpoints` (`:9000`), and explains that fixing `NetworkPolicy` shifts curl from timeout (`504`) to immediate response/refusal (`502`). | **Verification-order trap (`Flash-Lite`):** Curling `backend-service` after fixing only `targetPort` still times out (`504`) because `backend-firewall` drops the SYN packet! Verify port via `get endpoints`, or fix `NetworkPolicy` first. |
+| **L03 Challenge** (Step 1: `504` timeout only → Step 3: DNS `10.11.142.156` + Endpoint `10.10.0.167:8080`) | **Step 1:** Blames network block or port mismatch; suggests `kubectl exec ... curl` (violates read-only). **Step 3:** **Hallucinates an "IP mismatch between endpoints (`10.10.0.167`) and DNS (`10.11.142.156`)"**. | **Step 1:** Identifies packet drop (`NetworkPolicy`, 85% confidence) because TCP timeout != RST (`Connection refused`); checks `kubectl get netpol`. **Step 3:** Rules out DNS/ClusterIP (`10.11.142.156`) and empty endpoints; requests `netpol -o yaml`, `--show-labels`, and Deployment `containerPort`. | **Classic LLM hallucination (`Flash-Lite`):** Conflated the Service ClusterIP (`10.11.0.0/16`) with the Pod Endpoint IP (`10.10.0.0/16`). Great live teaching example of low *evidence closure* ([arXiv:2603.00468](https://arxiv.org/abs/2603.00468)). |
 
 ---
 
@@ -26,7 +40,7 @@
 ```text
 My pod is stuck in ImagePullBackOff, what do I do?
 ```
-Expected AI behavior (unmeasured): generic checklist: registry credentials, `imagePullSecrets`, network, rate limits, typo. Mostly plausible, none tied to *this* pod. Attendee may chase pull secrets that have nothing to do with it.
+**Observed AI behavior (Flash-Lite & Pro):** Both models return a generic 3-branch checklist (`NotFound`/typo, `401`/`403` registry authentication / `imagePullSecrets`, and network/DNS/rate-limiting timeouts) because no event output was supplied. Attendees using this prompt often waste time inspecting ServiceAccounts and `imagePullSecrets` on a public image.
 
 ### ✅ Good prompt
 ```text
@@ -37,13 +51,13 @@ network or "image does not exist" problem and what evidence separates them.
 Do not invent a replacement tag: tell me how I can check which tags exist.
 <PASTE describe pod>
 ```
-Expected: the `not found` line is cited; auth/network ruled out; the tag is the suspect.
+**Observed AI behavior (Flash-Lite & Pro):** Both models quote `rpc error: code = NotFound ... docker.io/library/nginx:1.27.99-alpine: not found`, classify the issue as "image does not exist", explicitly separate `NotFound` from `401/403 Unauthorized` (auth) and `i/o timeout` (network), and respect the negative constraint by providing Docker Hub API / `skopeo list-tags` commands instead of guessing a tag.
 
 ### Facilitator notes
 - **Expected finding:** the tag in the Deployment (`1.27.99`) does not exist; the Events say `not found`, which rules out credentials and network.
-- **Watch for:** the AI proposing a "valid" tag with confidence. Ask: "How do we know that tag exists?" (check the registry page or pull a known tag; do not trust memory).
-- **Discussion:** what changed between "paraphrase" and "verbatim"? Which line carried the answer?
-- **Rubric hint:** *time to useful evidence* is usually the big difference here.
+- **If an attendee gets a stray answer:** if the attendee omitted `"Do not invent a replacement tag"` and the LLM suggests a tag (e.g. `nginx:1.27-alpine` or `nginx:latest`), ask: *"Did the model verify that tag exists in the registry, or retrieve it from training memory? Why is `latest` disallowed by our production conventions?"*
+- **Discussion:** what changed between "paraphrase" and "verbatim"? Which single line in `Events` eliminated two-thirds of the generic checklist?
+- **Rubric hint:** *time to useful evidence* jumps from 1 (multi-turn checklist) to 2 (first-turn root cause).
 
 ---
 
@@ -73,7 +87,9 @@ My pod keeps crashing. Logs:
 <PASTE logs>
 How do I fix it?
 ```
-Expected AI behavior (unmeasured): confident diagnosis of the missing variable and a patch for it. An attendee applying only that fix will see the pod *still* crashing, because the second cause (the kernel kill) was never in the evidence.
+**Observed AI behavior (Flash-Lite vs Pro):**
+- **Flash-Lite:** Diagnoses only `KeyError: 'DATABASE_URL'` and stops. An attendee applying that fix sees the pod *still* crashing (`OOMKilled`), illustrating **incomplete exploration** ([arXiv:2602.09937](https://arxiv.org/abs/2602.09937)).
+- **Pro:** Gives a YAML snippet for `DATABASE_URL` (with placeholder `<configmap-name>` / `<key-name>` since the ConfigMap was omitted), but notices `warming 32MiB order cache` after the error line and warns the user to run `kubectl describe pod` to check for Exit Code 137 (`OOMKilled`). Even so, without `describe` and the ConfigMap, neither model knows the actual broken key name (`DB_CONNECTION_STRING`) or limit (`16Mi`).
 
 ### ✅ Good prompt
 ```text
@@ -86,13 +102,16 @@ Logs, `describe pod` (Last State + Limits) and the ConfigMap are below.
 3. Give the order to fix them in and how I confirm each fix separately.
 <PASTE logs, describe, configmap>
 ```
-Expected: two causes, each with its own evidence (the name mismatch; exit code 137 against the memory limit).
+**Observed AI behavior (Flash-Lite & Pro):** Both models identify both distinct causes with exact evidence quotes: (1) `KeyError: 'DATABASE_URL'` vs `DB_CONNECTION_STRING` in `order-config`, and (2) `Reason: OOMKilled` / `Exit Code: 137` with `memory: 16Mi` against `warming 32MiB order cache`.
 
 ### Facilitator notes
-- **Expected findings:** (1) the ConfigMap key does not match the name the app reads; (2) memory limit lower than the app's working set, shown by `OOMKilled` / exit 137.
-- **Teaching moment:** after fixing only one cause, have the attendee paste the *new* output back into the same chat and ask "what now?" This is stage 4 of the workflow.
-- **Unsafe-advice check:** if the AI proposes a very large memory limit "to be safe", ask for the smallest value justified by evidence. Reject guesses with no evidence behind the number.
-- **Watch for:** `--previous` logs being empty. Point attendees to `describe` for the Last State.
+- **Expected findings:** (1) the ConfigMap key does not match the name the app reads; (2) memory limit (`16Mi`) is lower than the app's working set (`32MiB` cache + Python runtime), shown by `OOMKilled` / exit 137.
+- **Note drift on fix order (Flash-Lite vs Pro):**
+  - `Flash-Lite` recommends fixing **ConfigMap first, Memory second**: if attendees do this, `ERROR config: KeyError: 'DATABASE_URL'` disappears from `kubectl logs`, while `describe pod` still shows `OOMKilled` (Exit 137).
+  - `Pro` recommends fixing **Memory first (`64Mi`), ConfigMap second**: if attendees do this, `OOMKilled` disappears and the container survives cache warming to print `FATAL: cannot start without database configuration` (Exit Code 1).
+  - Both sequences are valid **if** the attendee checks the symptom shift after the first change (stage 4 of the workflow).
+- **Unsafe-advice check:** Both models suggested `64Mi` (roughly 2x the `32MiB` cache for Python runtime overhead). If a model proposes a huge limit (e.g. `1Gi` or removing limits entirely), ask attendees to justify the number from the `32MiB` log line.
+- **Watch for:** `--previous` logs being empty. Point attendees to `describe` for `Last State`.
 
 ---
 
@@ -124,7 +143,7 @@ $ DNS from a pod in the namespace
 Here is my Service YAML. The frontend can't reach the backend, but the pods are Running. Why?
 <PASTE only backend-service YAML>
 ```
-Expected AI behavior (unmeasured): a plausible but incomplete answer: port mismatch is *possible* (if it can be inferred), or DNS, or "check your readiness probe". It cannot see the NetworkPolicy or the labels. Likely unsafe suggestions: "temporarily delete the NetworkPolicy", "use `hostNetwork`", "run as privileged". Attendees applying them would remove the isolation the policy exists for, and the first symptom might even clear while leaving the second fault unfixed.
+**Observed AI behavior (Flash-Lite & Pro):** Because only `backend-service` was pasted, both models guess across 3–4 hypotheses (pod label selector mismatch, `targetPort: 8080` vs container port, `NetworkPolicy` blocking traffic, or DNS failure). When attendees follow up impatiently (*"how do I quickly unblock traffic to test?"*), models frequently suggest `kubectl delete networkpolicy` or `hostNetwork: true`, which removes the security boundary while leaving the `targetPort` bug broken.
 
 ### ✅ Good prompt
 ```text
@@ -138,12 +157,14 @@ NetworkPolicy YAML and `get pods --show-labels`.
 3. How do I verify each fix separately before applying the other?
 <PASTE evidence>
 ```
-Expected: two disagreements (Service target port vs container port; policy `from` selector vs frontend labels), minimal patches, a separate check for each.
+**Observed AI behavior (Flash-Lite vs Pro):** Both models quote the exact disagreements (`targetPort: 8080` vs `containerPort: 9000`; `role: api-consumer` vs `role: web-frontend`) and give minimal patches that preserve isolation. However, their **verification instructions diverge**:
+- **Flash-Lite trap:** Suggests fixing `targetPort` first and running an in-cluster curl probe to `backend-service`. **This fails in practice** because `backend-firewall` still drops the packets, so curl still times out (`504`)!
+- **Pro verification:** Verifies the `targetPort` fix via control-plane state (`kubectl get endpoints backend-service` → `10.10.0.167:9000`), and explains that fixing the `NetworkPolicy` changes the data-plane probe from a silent timeout (`504`) to an immediate response (or `502 Connection refused` if the port is still `8080`).
 
 ### Facilitator notes
-- **Expected findings:** (1) Service `targetPort` does not match the port the backend container listens on (visible in endpoints and the backend Deployment); (2) the NetworkPolicy `from` selector does not match the frontend pod's `role` label.
-- **Why order matters:** with the policy fixed first, the symptom changes (timeout → refusal). That change is *evidence*; have attendees paste it back to the AI.
-- **Unsafe-advice check:** score 0 on "unsafe advice" if an attendee applied a policy deletion, `hostNetwork` or privileged workaround.
+- **Expected findings:** (1) Service `targetPort` (`8080`) does not match the backend `containerPort` (`9000`); (2) NetworkPolicy `from` selector (`role: api-consumer`) does not match the frontend pod's label (`role: web-frontend`).
+- **Why order matters (highlight the `Flash-Lite` trap):** Ask attendees: *"If you fix `targetPort` first and test with `curl`, why does `curl` still time out?"* (Cilium drops the SYN packet before it reaches the backend pod; only `kubectl get endpoints` can confirm the port change while the firewall still blocks traffic, whereas fixing the `NetworkPolicy` first immediately shifts the HTTP status from `504` to `502`).
+- **Unsafe-advice check:** Score `0` on safety if an attendee deleted `backend-firewall`, replaced `podSelector` with `{}` (allow-all), or enabled `hostNetwork`.
 - **Teaching point:** Kubernetes docs list the NetworkPolicy and the selector/`targetPort` checks as separate steps ([research notes E2/E3](ai-research-notes.md)), and an AI answers only about what it sees.
 
 ---
@@ -156,34 +177,37 @@ Expected: two disagreements (Service target port vs container port; policy `from
 Attendee starts `level-03` and gives the AI **only** this (incomplete) evidence:
 ```text
 kubectl get pods -n escape-level-03     → all Running 1/1
-Frontend returns an error for GET /api/data
+Frontend returns 504 for GET /api/data
 Frontend error log: "upstream timed out (110: Operation timed out) while connecting to upstream"
 ```
 
 ### Step 1: capture the hypothesis
 Ask: *"What is the most likely root cause? Give your confidence and one command that would disprove it."*
-**Expected first hypotheses (classes, unmeasured):** backend not ready / crashing; DNS problem; app-level timeout; resource limits; "backend is overloaded".
+**Observed Step 1 outputs:**
+- **Flash-Lite:** Blames a network block or service/port mismatch (High confidence), and proposes `kubectl exec -n escape-level-03 frontend-pod -- curl -v backend-service` (note: `exec` is not a read-only `get`/`describe`/`logs` inspection command, and a wrong port causes `Connection refused`, not `Operation timed out`).
+- **Pro:** Distinguishes TCP packet drop (`Operation timed out` → `NetworkPolicy` silently dropping SYN packets, ~85% confidence) from TCP RST (`Connection refused`), and proposes `kubectl get netpol -n escape-level-03` to confirm or disprove. (Unconstrained chat prompts without the `upstream timed out` line also frequently guess DNS, backend overload, or crashing pods.)
 
 ### Step 2: try to disprove it with read-only checks
 | Hypothesis | Read-only check | Observed result in the broken cluster |
 |---|---|---|
 | Backend is down | `kubectl get pods -n escape-level-03` | Backend `Running 1/1`: **contradicts** |
-| DNS is broken | resolve `backend-service` from a pod in the namespace | Resolves to the Service IP: **contradicts** |
-| Service has no backends | `kubectl get endpoints -n escape-level-03` | An endpoint exists, on a port worth comparing with the container: **partial lead** |
+| DNS is broken | resolve `backend-service` from a pod in the namespace | Resolves to the Service IP (`10.11.142.156`): **contradicts** |
+| Service has no backends | `kubectl get endpoints -n escape-level-03` | An endpoint exists (`10.10.0.167:8080`), on a port worth comparing with the container: **partial lead** |
 | Something drops traffic | `kubectl get netpol -n escape-level-03 -o yaml` and `--show-labels` | A policy selects the backend; the allowed `from` label is worth comparing with the frontend's labels: **strong lead** |
 
 ### Step 3: correct the AI
-Attendee pastes the contradicting outputs and asks:
+Attendee pastes the contradicting outputs (DNS resolves to `10.11.142.156`, Endpoints shows `10.10.0.167:8080`, pods `Running 1/1`) and asks:
 ```text
 Your hypothesis was <X>. Here is evidence that contradicts it: <PASTE>.
 Which parts of your earlier answer are now wrong? What do you conclude now, with what confidence,
 and which resources do you still need to see?
 ```
 
-### Facilitator notes and expected findings
-- **A good revision:** the AI abandons "backend down" and "DNS", says what is *still unknown*, and asks for the NetworkPolicy and the Service/Deployment port details. A poor revision: it doubles down, or reshuffles the same guess.
-- **Discuss:** Who noticed the contradiction, the human or the AI? How many turns did it take? What would an agent with read-only tools have fetched on its own?
-- **Score** with the rubric. Typical good result: correctness 2, missed signals 1–2 (depends on first prompt), unsafe advice 2.
+### Facilitator notes and observed Step 3 findings
+- **Observed good revision (`Gemini Pro`):** Explicitly rules out DNS failure (recognizing `10.11.142.156` as the Service ClusterIP), pod crashes, and empty endpoints (`10.10.0.167:8080`), and asks for the exact three missing resources: `kubectl get networkpolicy -n escape-level-03 -o yaml`, `kubectl get pods -n escape-level-03 --show-labels`, and the backend Deployment's `containerPort`.
+- **Observed hallucination to watch for (`Gemini Flash-Lite`):** When shown DNS = `10.11.142.156` and Endpoints = `10.10.0.167:8080`, `Flash-Lite` claimed there was an **"IP mismatch between endpoints (`10.10.0.167`) and DNS (`10.11.142.156`)"**! Point this out in the debrief: in Kubernetes (`kind/cluster-config.yaml`), `10.11.0.0/16` is the **Service `ClusterIP` subnet** (returned by DNS) and `10.10.0.0/16` is the **Pod subnet** (listed in `Endpoints`). They are *supposed* to be different IPs. An attendee who doesn't verify the model's reasoning would chase a phantom CNI/DNS bug.
+- **Discuss:** Who noticed the contradiction or the ClusterIP-vs-PodIP conflation, the human or the AI? How many turns did it take? What would an agent with read-only tools have fetched on its own?
+- **Score** with the rubric. Typical good result: Correctness & Evidence Closure 2 (`Pro`) vs 1 (`Flash-Lite`, due to ClusterIP conflation), Exploration Completeness 1–2, Safety & Verification 2.
 - **Variation:** inject the fake instruction line from cheatsheet guardrail 5 into a pasted log and see whether the copilot follows it. **Do this only with the attendee's own pasted text, never in cluster data.** It demonstrates untrusted input without risk.
 
 ---
@@ -193,8 +217,8 @@ and which resources do you still need to see?
 Only if the instructor has the tooling set up **outside** the harness. Do not assume attendees have it.
 
 1. Export `KUBECONFIG=kind/.kube/config` before starting the assistant.
-2. Set it to read-only (MCP read-only setting, or CLI agent permissions per the cheatsheet section 4).
+2. Configure strict read-only access using the verified `mcp-config.toml` (`containers/kubernetes-mcp-server`) or `opencode.json` (`opencode`) snippets in [`ai-prompts-cheatsheet.md`](ai-prompts-cheatsheet.md) section 4 (remember: keep `v1/Secret` denied, but allow `v1/ConfigMap` so Level 02's `order-config` can be read).
 3. Prompt: *"Investigate the pod in escape-level-02 using read-only tools only. Report every root cause with the command output that proves it. Do not change anything."*
-4. Compare with the copy-paste route: how many calls did it make, did it read `describe`, did it find both causes, did it try anything it should not have?
+4. Compare with the copy-paste route: how many calls did it make (`pods_list` → `pods_get` → `pods_log` → `events_list` → `resources_get` on `ConfigMap/order-config`), did it inspect `LastState.Terminated` (`OOMKilled`), did it find both causes on the first pass, and did permission gates block any mutating call?
 
-**Status: not run for this repo.** Mark results here after a dry run, and update the M5 session log.
+**Status:** Configuration schemas (`mcp-config.toml` and `opencode.json`) verified against upstream docs; live CLI agent execution remains optional for instructors with `opencode` / `npx kubernetes-mcp-server` installed.
