@@ -14,14 +14,14 @@ Each level presents a realistic incident alert. Pods are broken, traffic is down
 |---|---|---|---|---|
 | 01 | The Ghost Image | ⭐ Warm-up | `ImagePullBackOff` / bad image tag | ✅ Available |
 | 02 | The Crashing Config | ⭐⭐ Core | `CrashLoopBackOff` / OOMKill + ConfigMap mismatch | ✅ Available |
-| 03 | The Silent Wall | ⭐⭐⭐ Boss | NetworkPolicy + Service port mismatch | 🚧 Planned |
+| 03 | The Silent Wall | ⭐⭐⭐ Boss | NetworkPolicy + Service port mismatch | ✅ Available |
 | 04 | The Ghost in the Microservices | ⭐⭐⭐⭐ Bonus | Cascading 500s hidden in log noise | 🚧 Planned |
 
 All levels run locally via a single CLI tool:
 
 ```bash
 ./scripts/escape-room.sh setup          # spin up a Kind cluster
-./scripts/escape-room.sh start level-01 # inject the broken scenario (or level-02)
+./scripts/escape-room.sh start level-01 # inject the broken scenario (or level-02, level-03)
 ./scripts/escape-room.sh hint           # get a progressive hint
 ./scripts/escape-room.sh ai-assist      # tip for using an AI copilot on this level
 ./scripts/escape-room.sh verify         # check if you've escaped
@@ -83,4 +83,4 @@ kubectl version    # >= 1.28
 
 ## Status
 
-> 🚧 **Implementation in progress.** Levels 01–03 are implemented; level 04 (bonus) is not yet. Next: M5 (AI-assisted troubleshooting best practices, incl. optional MCP and CLI agents) and M6 (workshop docs). See [`docs/sessions/00-milestones.md`](docs/sessions/00-milestones.md) for the current milestone status and review gates.
+> 🚧 **Implementation in progress.** Levels 01–03 and M5 (AI-assisted troubleshooting best practices, incl. optional MCP and CLI agents) are implemented; level 04 (bonus) is not yet. Next: M6 (workshop docs & one-page cheatsheet). See [`docs/sessions/00-milestones.md`](docs/sessions/00-milestones.md) for the current milestone status and review gates.

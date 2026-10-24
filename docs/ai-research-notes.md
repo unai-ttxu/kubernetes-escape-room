@@ -1,7 +1,7 @@
 # AI Research Notes — LLM-Assisted Kubernetes Troubleshooting
 
 > Sources behind [`ai-prompts-cheatsheet.md`](ai-prompts-cheatsheet.md) and [`ai-exercises.md`](ai-exercises.md).
-> Every link below was fetched on **2026-10-23** (access date). Where a page shows no publication date it is marked "n/d".
+> Every link below was fetched on **2026-10-23** / **2026-10-24** (access dates). Where a page shows no publication date it is marked "n/d".
 > Claims are paraphrased from the fetched page, not from memory. Re-check version-sensitive items (MCP server config, opencode keys) before the event.
 
 ---

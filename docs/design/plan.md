@@ -90,14 +90,14 @@
 
 ### Level 03: "The Silent Wall" (Boss Level)
 
-- **Simulated Incident:** Pager alert: *"CRITICAL: frontend-api is returning 502 Bad Gateway to end users. All pods are reporting Running 1/1."*
+- **Simulated Incident:** Pager alert: *"CRITICAL: frontend-service is returning 504 Gateway Time-out / 502 Bad Gateway to end users. All pods are reporting Running 1/1."*
 - **Intentional Bug:**
   1. Frontend Pod and Backend Pod are both healthy (`Running 1/1`).
   2. Backend Service has `spec.ports[0].targetPort: 8080`, but the Backend container listens on port `9000`.
   3. A strict `NetworkPolicy` (`backend-firewall`) was applied that only allows ingress from pods labeled `role: api-consumer`, but Frontend Pod is labeled `role: web-frontend`.
 - **Attendee Symptoms:**
   - `kubectl get pods -n escape-level-03` shows everything green (`Running`).
-  - Executing curl from Frontend pod to Backend times out or returns `502`.
+  - Executing curl through Frontend to Backend returns `504` (timeout while dropped by `NetworkPolicy`) or `502` (connection refused while `targetPort` is mismatched).
 - **Verification Logic (`verify.sh`):**
   1. Probe pod runs inside `escape-level-03`: `curl -fsS http://frontend-service.escape-level-03.svc.cluster.local:80/api/data`.
   2. Returns `HTTP 200` with payload `{"data":"backend-connected"}`.

@@ -16,24 +16,24 @@ Teach a repeatable, evidence-based way to use AI during an incident, using the t
 
 | File | Purpose |
 |---|---|
-| `docs/ai-prompts-cheatsheet.md` | 5-stage workflow with a prompt per stage, nine bad/good tips tied to levels, six guardrails (incl. a fake prompt-injection example), tool tiers (chat, runbook retrieval, MCP, CLI agents), evaluation rubric |
-| `docs/ai-exercises.md` | Instructor guide: bad/good prompts and facilitator notes per level, the required challenge-the-hypothesis exercise (Level 03), optional MCP/CLI-agent run |
-| `docs/ai-research-notes.md` | Cited sources with access dates; established vs emerging; unverified items; source conflicts |
-| `scenarios/*/ai-assist.md` | One attendee-facing AI tip per level (bad vs good, no fix) |
+| `docs/ai-prompts-cheatsheet.md` | 5-stage workflow with a prompt per stage, nine bad/good tips tied to levels, six guardrails (incl. a fake prompt-injection example), tool tiers (chat, runbook retrieval, verified `mcp-config.toml` and `opencode.json`), evaluation rubric |
+| `docs/ai-exercises.md` | Instructor guide: empirical Model Evaluation Matrix (`Gemini Flash-Lite` vs `Gemini Pro`), bad/good prompts and facilitator notes per level, the required challenge-the-hypothesis exercise (Level 03), optional MCP/CLI-agent run |
+| `docs/ai-research-notes.md` | Cited sources with access dates; established vs emerging (incl. K8sGPT M4 and Runbook RAG M5); verification status; source conflicts |
+| `scenarios/*/ai-assist.md` | One attendee-facing AI tip per level (bad vs good, spoiler-audited, no fix) |
 | `scripts/escape-room.sh` | New `ai-assist` command: prints the current level's `ai-assist.md`; does not touch `HINT_LEVEL`; listed in `start` and usage |
 | `scenarios/level-03-silent-wall/incident.md`, `hints.md` | Updated gateway error wording from `502` to `504` / `502` to match observed Cilium behaviour |
-| `README.md`, `AGENTS.md` | Directory trees, command list and harness behaviour updated (rules 8, 16) |
+| `README.md`, `AGENTS.md` | Directory trees, command list, status and harness behaviour updated (rules 8, 16) |
 | `docs/sessions/00-milestones.md` | M5 status set to 🔍 In review; deliverables list updated; checklist **not** ticked (rule 17) |
-| `docs/design/plan.md` | Amendment 5 (facilitator notes outside `hints.md`) |
+| `docs/design/plan.md` | CLI spec and Amendment 5 (`docs/ai-exercises.md` and `ai-assist` command) |
 
 ---
 
 ## 💡 Key Design Decisions
 
-1. **Facilitator notes are not in `hints.md`.** `extract_hint` prints everything under a hint heading, so notes after Hint 3 would reach attendees. They live in `docs/ai-exercises.md` (Amendment 5, flagged for review). This deviates from the milestone's original "scenarios/*/hints.md" bullet.
-2. **Attendee docs never contain fixes.** The cheatsheet describes symptoms and evidence only; answers are in the instructor file.
-3. **Primary sources over summaries.** A search summary claimed `kubernetes-mcp-server` has `--read-only` CLI flags. The repo's own configuration doc says `read_only` is a TOML key and the CLI takes only bootstrap options, and that `$KUBECONFIG` is not a server option. The docs follow the primary source and tell readers to check the installed version. The same applies to opencode's `shell` vs older `bash` permission key.
-4. **Rubric scores evidence, not only the verdict**, following the cited benchmark work (E6, E7).
+1. **Facilitator notes are not in `hints.md`.** `extract_hint` prints everything under a hint heading, so notes after Hint 3 would reach attendees. They live in `docs/ai-exercises.md`, while attendee-facing tips live in `scenarios/*/ai-assist.md` and are shown by `./scripts/escape-room.sh ai-assist` (Amendment 5, flagged for review).
+2. **Attendee docs never contain fixes.** The cheatsheet and `scenarios/*/ai-assist.md` describe symptoms and evidence only; answers and observed model outputs are in the instructor file (`docs/ai-exercises.md`).
+3. **Primary sources over summaries.** A search summary claimed `kubernetes-mcp-server` has `--read-only` CLI flags and string-list `denied_resources`. The repo's own `docs/configuration.md` specifies `read_only = true` and `[[denied_resources]]` GVK tables in TOML (`--config`), and notes that `$KUBECONFIG` is not a CLI option. Furthermore, `v1/ConfigMap` must **not** be added to `[[denied_resources]]` because Level 02 requires inspecting `ConfigMap/order-config`. The same primary-source check was applied to `opencode` (`permission.shell` vs legacy `permission.bash`), `k8sgpt` (`analyze --explain --anonymize`), and Runbook RAG citations (RCACopilot, OpsEval, AutoBnB-RAG, IT Support RAG).
+4. **Rubric scores evidence closure and exploration completeness, not only the verdict**, following Cloud-OpsBench (`arXiv:2603.00468`) and systematic RCA failure analysis (`arXiv:2602.09937`).
 
 ---
 
@@ -74,10 +74,10 @@ The first `setup` found an old `escape-room` kind cluster whose only node had th
 - [ ] Established practices are clearly separated from emerging ideas
 - [ ] The challenge-the-hypothesis exercise has facilitator notes and expected findings
 - [ ] Guardrails section covers all six rules
-- [ ] MCP / opencode steps were tested, or are explicitly flagged as untested (flagged untested)
+- [ ] MCP / opencode steps were tested, or are explicitly flagged as untested (config schemas verified against upstream docs; live binary execution flagged not run locally)
 - [ ] Workflow is coherent with the existing level hints (Concept → Investigation → AI prompt)
-- [ ] `./scripts/escape-room.sh ai-assist` on each level: tips are useful and give nothing away
-- [ ] Dry-run the "bad" and "good" prompts with at least one free copilot and adjust the expected-behavior lines
+- [ ] `./scripts/escape-room.sh ai-assist` on each level: tips are useful and give nothing away (spoiler-audited)
+- [ ] Dry-run the "bad" and "good" prompts with at least one free copilot and adjust the expected-behavior lines (completed across `Gemini Flash-Lite` and `Gemini Pro`; see Model Evaluation Matrix in `docs/ai-exercises.md`)
 
 ---
 

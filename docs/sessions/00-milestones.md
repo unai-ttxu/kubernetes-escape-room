@@ -129,7 +129,7 @@ scenarios/level-02-crashing-config/
 1. Backend Service `targetPort: 8080` but container listens on `9000`
 2. `NetworkPolicy` allows ingress from `role: api-consumer` but Frontend Pod is labeled `role: web-frontend`
 
-**Symptom:** All pods `Running 1/1`, but `curl` frontend → backend returns `502` / times out
+**Symptom:** All pods `Running 1/1`, but `curl` frontend → backend returns `504` / `502`
 
 **Deliverables:**
 ```
