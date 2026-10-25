@@ -255,7 +255,7 @@ docs/
     ├── package.json                # Slidev + playwright-chromium dependencies & scripts
     ├── style.css                   # Deck theme (colors, cards, chips)
     ├── setup/mermaid.ts            # Mermaid diagram theme
-    └── slides.md                   # Full 27-slide workshop deck (Levels 01–03; Level 04 is a take-home)
+    └── slides.md                   # Full 24-slide workshop deck (Levels 01–03; Level 04 is a take-home)
 ```
 
 **`pre-workshop-checklist.md` must cover:**
