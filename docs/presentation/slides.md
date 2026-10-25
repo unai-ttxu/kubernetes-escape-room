@@ -115,7 +115,7 @@ layout: default
   <div class="card good"><div class="chip green">Now</div><h4 class="pt-2">LLM copilots & agents</h4><span class="small">Paste evidence, get a hypothesis in seconds. Agents can even run the commands for you.</span></div>
 </div>
 
-<div class="pt-6 quote">
+<div class="quote">
   Each step made evidence cheaper to collect. The bottleneck moved to <b>interpreting</b> it correctly.
 </div>
 
@@ -188,7 +188,7 @@ layout: default
   </div>
 </div>
 
-<div class="pt-6 quote">An LLM's answer is a hypothesis. The cluster is the judge.</div>
+<div class="quote">An LLM's answer is a hypothesis. The cluster is the judge.</div>
 
 <!--
 Transition to Part 3: the rest of the talk is about how to keep the benefits and avoid the failure modes.
@@ -662,7 +662,7 @@ Practice stages 3 and 4: test a confident guess with **read-only** checks.
   <div class="card warn"><div class="chip red">Step 3</div><h4 class="pt-2">Spot the classic trap</h4><span class="small">Models claim an "IP mismatch" between DNS and Endpoints. But one is the <b>Service ClusterIP</b> subnet and the other is the <b>Pod</b> subnet.</span></div>
 </div>
 
-<div class="pt-4 quote">How many of you saw your AI blame DNS, or confuse a ClusterIP with a Pod IP?</div>
+<div class="quote">How many of you saw your AI blame DNS, or confuse a ClusterIP with a Pod IP?</div>
 
 <!--
 Run for about 5 minutes. The goal is not the fix, it is practicing disproving a plausible-sounding answer.

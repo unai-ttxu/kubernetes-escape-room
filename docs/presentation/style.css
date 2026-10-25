@@ -124,3 +124,18 @@
 
 .slidev-layout.end { letter-spacing: normal; text-align: center; }
 .slidev-layout.end .quote { border-left: 0; padding-left: 0; }
+
+.slidev-layout.two-cols-header { column-gap: 1.5rem; }
+
+.quote { margin-top: 1.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem; }
+
+.slide-number {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 0.8rem;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+  opacity: 0.7;
+  z-index: 10;
+  font-variant-numeric: tabular-nums;
+}
