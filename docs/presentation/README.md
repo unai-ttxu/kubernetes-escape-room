@@ -24,8 +24,7 @@ kubernetes-escape-room/
         ├── package.json                  # Slidev + playwright-chromium dependencies & scripts
         ├── slides.md                     # Main presentation deck
         ├── style.css                     # Shared theme (colors, cards, chips)
-        ├── global-bottom.vue             # Slide number (<n>/<total>) on every slide but the cover
-        └── setup/mermaid.ts              # Mermaid diagram theme
+        └── global-bottom.vue             # Slide number (<n>/<total>) on every slide but the cover
 ```
 
 ---

@@ -24,12 +24,12 @@ AI as a copilot, not an autopilot.
 <div class="pt-6 flex gap-3">
   <span class="chip"><carbon-user-multiple /> Platform · SRE · Software Engineers</span>
   <span class="chip violet"><carbon-flag /> 3 levels</span>
-  <span class="chip green"><carbon-time /> ~50 min</span>
+  <span class="chip green"><carbon-time /> ~55 min</span>
 </div>
 
 <!--
 Welcome attendees! Confirm everyone has cloned the repo and run `./scripts/escape-room.sh setup`.
-Timing: talk (slides 2-14) ~10 min, hands-on (15-22) ~35 min, debrief (23-24) ~5 min.
+Timing: talk (slides 2-14) ~10 min, hands-on (15-22) ~40 min, debrief (23-24) ~5 min.
 -->
 
 ---
@@ -58,7 +58,7 @@ layout: default
 </div>
 
 <!--
-Roughly: 10 min of talk, ~35 min hands-on across three levels, 5 min debrief.
+Roughly: 10 min of talk, 35-40 min hands-on across three levels, 5 min debrief.
 -->
 
 ---
@@ -239,7 +239,7 @@ layout: default
 
 <div class="body">
 
-<div class="sub"><code>Context + Symptom + Raw output + Goal</code></div>
+<div class="sub"><code>Context + Symptom + Raw kubectl output + Goal</code></div>
 
 <div class="grid-2">
 <div class="card bad">

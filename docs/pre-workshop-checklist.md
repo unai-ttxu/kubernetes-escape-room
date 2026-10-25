@@ -1,6 +1,6 @@
 # Pre-Workshop Checklist — Instructor & Attendee Guide
 
-> This guide covers everything needed to prepare, verify, and run the **Kubernetes Escape Room** workshop (40–50 min), including step-by-step instructions that any facilitator (including non-SREs) can follow and fallback plans for common venue or laptop issues.
+> This guide covers everything needed to prepare, verify, and run the **Kubernetes Escape Room** workshop (~55 min: 10 min talk, three levels, debrief), including step-by-step instructions that any facilitator (including non-SREs) can follow and fallback plans for common venue or laptop issues.
 
 ---
 
@@ -50,10 +50,23 @@ Every scenario is designed to work with **zero AI tooling setup** using any free
 | Tier | Setup Required | How It Works |
 | :--- | :--- | :--- |
 | **Tier 1: Web Copilot (Default)** | **None** — open Gemini, ChatGPT, or Claude in a browser | Copy-paste raw `kubectl` output using the **SRE Copilot Prompt Pattern** in [`docs/ai-prompts-cheatsheet.md`](ai-prompts-cheatsheet.md) |
-| **Tier 2: Read-Only Kubernetes MCP Server** | Optional (`Node.js` / `npx` + MCP-capable client) | Calls read-only cluster tools (`pods_list`, `pods_get`, `pods_log`, `events_list`, `resources_get`) scoped to `kind/.kube/config` |
-| **Tier 3: CLI Agent (`opencode`, `kubectl-ai`)** | Optional (CLI agent binary installed) | Runs `kubectl get`/`describe`/`logs` with a read-only permission policy (`opencode.json`) |
+| **Tier 2: `k8sgpt`** | Optional (`k8sgpt` binary + an AI backend configured with `k8sgpt auth`) | Runs built-in analyzers locally (`k8sgpt analyze`); `--explain` sends the structured finding to the AI backend, `--anonymize` masks sensitive fields. Use it as a first look, then confirm with `describe` / `logs` |
+| **Tier 3: Read-Only Kubernetes MCP Server** | Optional (`Node.js` / `npx` + MCP-capable client) | Calls read-only cluster tools (`pods_list`, `pods_get`, `pods_log`, `events_list`, `resources_get`) scoped to `kind/.kube/config` |
+| **Tier 4: CLI Agent (`opencode`, `kubectl-ai`)** | Optional (CLI agent binary installed) | Runs `kubectl get`/`describe`/`logs` with a read-only permission policy (`opencode.json`) |
 
-### Optional Tier 2 Setup: Read-Only Kubernetes MCP Server
+### Optional Tier 2 Setup: `k8sgpt`
+
+Install `k8sgpt` from the [k8sgpt docs](https://k8sgpt.ai/docs/getting-started/overview), configure a backend with `k8sgpt auth` (a local model avoids sending cluster data off-machine), and point it at the workshop cluster:
+
+```bash
+export KUBECONFIG="$PWD/kind/.kube/config"
+k8sgpt analyze --namespace escape-level-01 --explain --anonymize
+k8sgpt analyze --filter=NetworkPolicy --namespace escape-level-03
+```
+
+> Not executed on the build machine (see [`ai-research-notes.md`](ai-research-notes.md), M4): verify the flags against the installed version before the event.
+
+### Optional Tier 3 Setup: Read-Only Kubernetes MCP Server
 
 If an attendee or instructor wants to use [`containers/kubernetes-mcp-server`](https://github.com/containers/kubernetes-mcp-server), create `mcp-config.toml` in the repository root (gitignored):
 
@@ -85,7 +98,7 @@ Register the server in your MCP client configuration:
 }
 ```
 
-### Optional Tier 3 Setup: CLI Agent (`opencode`)
+### Optional Tier 4 Setup: CLI Agent (`opencode`)
 
 To restrict `opencode` to read-only cluster inspection (and prevent it from running `./scripts/escape-room.sh solve`), save `opencode.json` in the repository root (gitignored) and launch with `KUBECONFIG=kind/.kube/config opencode`:
 
@@ -156,15 +169,16 @@ Run this deterministic smoke test from the repository root to verify the harness
 
 ---
 
-## 4. Workshop Pacing Guide (45–50 Minutes)
+## 4. Workshop Pacing Guide (~55 Minutes)
 
 | Time | Segment | Facilitator Action |
 | :--- | :--- | :--- |
 | `00:00–10:00` | **Talk: incidents, then vs now, AI best practices & tooling** | Present Slides 2–14: incident lifecycle, 5-stage evidence loop, guardrails, tooling tiers (`k8sgpt`, MCP, CLI agents), sharing skills/MCP; Slide 15 for the harness |
-| `10:00–20:00` | **Level 01: The Ghost Image** | Attendees run `start level-01`. Compare vague prompt vs pasting `describe pod` Events (Slides 16–17) |
-| `20:00–33:00` | **Level 02: The Crashing Config** | Attendees run `start level-02`. Highlight compound faults: `KeyError` in logs + `OOMKilled` in `describe` (Slides 18–19) |
-| `33:00–46:00` | **Level 03: The Silent Wall** | Attendees run `start level-03`. Run the 5-min **Challenge the AI's Hypothesis** exercise (`504` vs `502`, ClusterIP vs Pod IP) (Slides 20–22) |
-| `46:00–50:00` | **Debrief & Rubric** | Score AI assistance with the 4-criterion rubric, announce Level 04 as a take-home, and run `./scripts/escape-room.sh cleanup` (Slides 23–24) |
+| `10:00–19:00` | **Level 01: The Ghost Image** | Attendees run `start level-01`. Compare vague prompt vs pasting `describe pod` Events (Slides 16–17) |
+| `19:00–33:00` | **Level 02: The Crashing Config** | Attendees run `start level-02`. Highlight compound faults: `KeyError` in logs + `OOMKilled` in `describe` (Slides 18–19) |
+| `33:00–50:00` | **Level 03: The Silent Wall** | Attendees run `start level-03`. Run the 5-min **Challenge the AI's Hypothesis** exercise (`504` vs `502`, ClusterIP vs Pod IP) (Slides 20–22) |
+| `50:00–55:00` | **Debrief & Rubric** | Score AI assistance with the 4-criterion rubric, announce Level 04 as a take-home, and run `./scripts/escape-room.sh cleanup` (Slides 23–24) |
+| *Flex* | **Per-level targets** | Design targets are 8–10, 12–15 and 15–20 min (Levels 01–03). Fast rooms move on early; if you run long, skip the Level 03 exercise discussion rather than the debrief |
 | *Take-home* | **Level 04: Ghost Microservices** | Not presented in the deck. Fast finishers or attendees run `start level-04` (`5,000`-line log haystack + `grep -A 5 -E "ERROR\|Exception"`) |
 
 ---

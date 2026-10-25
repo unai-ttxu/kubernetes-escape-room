@@ -6,7 +6,7 @@
 
 ## Project Context
 
-This is a **Kubernetes Escape Room** — a hands-on collaborative workshop (40–50 min) for Platform/SRE/Software engineers. Attendees debug intentionally broken Kubernetes scenarios with the help of AI copilots, CLI agents, and agentic harnesses.
+This is a **Kubernetes Escape Room** — a hands-on collaborative workshop (~55 min: 10 min talk, three levels, debrief) for Platform/SRE/Software engineers. Attendees debug intentionally broken Kubernetes scenarios with the help of AI copilots, CLI agents, and agentic harnesses.
 
 **Key files:**
 - [`docs/design/plan.md`](docs/design/plan.md) — Full architecture & implementation plan (source of truth)
@@ -109,7 +109,7 @@ kubernetes-escape-room/
     │   ├── package.json             # Slidev dependencies & scripts
     │   ├── slides.md                # Workshop presentation deck (M6)
     │   ├── style.css                # Deck theme (colors, cards, chips)
-    │   └── setup/mermaid.ts         # Mermaid diagram theme
+    │   └── global-bottom.vue        # Slide numbers (<n>/<total>)
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
     │   ├── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup

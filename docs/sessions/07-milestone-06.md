@@ -22,11 +22,11 @@ Complete Milestone 6 by:
 | :--- | :--- |
 | [`docs/presentation/slides.md`](../presentation/slides.md) | 24-slide Slidev deck: incident management context, troubleshooting then vs now, AI best practices (5-stage loop, guardrails, tooling tiers incl. `k8sgpt`, MCP, sharing skills), Levels 01–03 briefings & debriefs, the Level 03 Challenge-the-AI-Hypothesis exercise, and the rubric (Level 04 is a take-home) |
 | [`docs/presentation/package.json`](../presentation/package.json) | Slidev (`@slidev/cli`, `@slidev/theme-default`, `vue`) and PDF export (`playwright-chromium`) dependencies |
-| [`docs/presentation/style.css`](../presentation/style.css), [`docs/presentation/setup/mermaid.ts`](../presentation/setup/mermaid.ts) | Deck theme and Mermaid diagram theme |
+| [`docs/presentation/style.css`](../presentation/style.css), [`docs/presentation/global-bottom.vue`](../presentation/global-bottom.vue) | Deck theme and slide numbers (`<n>/<total>`) |
 | [`docs/presentation/README.md`](../presentation/README.md) | Contributor guide for running Slidev locally, using the `slidev` skill, and configuring the Slidev MCP server |
 | [`skills-lock.json`](../../skills-lock.json) | Pins the official `slidevjs/slidev` agent skill; files in `.agents/skills/` are gitignored and restored by `make setup-dev` (or `npx skills experimental_install`) |
 | [`.agents/plugins/slidev/plugin.json`](../../.agents/plugins/slidev/plugin.json), [`mcp_config.json`](../../.agents/plugins/slidev/mcp_config.json), [`.mcp.json`](../../.mcp.json) | Slidev MCP server configuration for Antigravity and standard CLI/IDE MCP clients |
-| [`docs/pre-workshop-checklist.md`](../pre-workshop-checklist.md) | Instructor pre-event smoke tests, attendee prerequisites, optional read-only MCP/CLI agent configs, 45–50 min pacing guide, and 5 fallback playbooks |
+| [`docs/pre-workshop-checklist.md`](../pre-workshop-checklist.md) | Instructor pre-event smoke tests, attendee prerequisites, optional read-only MCP/CLI agent configs, ~55 min pacing guide, and 5 fallback playbooks |
 | [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md) | Condensed 68-line one-page A4 SRE Copilot reference (Prompt Pattern, 5-stage loop, clean `kubectl` extraction, common K8s AI hallucinations, 6 guardrails, 4-row rubric) |
 | [`Makefile`](../../Makefile) | Task runner for `setup-dev`, `slides`, `slides-export`, `lint`, `check`, `validate`, cluster lifecycle commands, and `test` (`LEVEL=level-XX` or `LEVEL=all`) |
 | [`AGENTS.md`](../../AGENTS.md), [`README.md`](../../README.md), [`docs/design/plan.md`](../design/plan.md), [`docs/sessions/00-milestones.md`](00-milestones.md), [`.gitignore`](../../.gitignore) | Synchronized directory trees, build/test commands, Amendment 7, and M6 learnings |
@@ -65,7 +65,7 @@ Checks run:
   - All executable scripts verified at `chmod 750` (`-rwxr-x---`).
   - Relative-path audit confirmed 0 hardcoded `/Users/<name>` or `/home/<name>` paths across all repository files.
 - Slidev MCP server, build & PDF export verification:
-  - Verified JSON-RPC `initialize`, `slidev-get-info`, and `slidev-list-slides` over stdio via `npx --prefix docs/presentation slidev mcp docs/presentation/slides.md` (all 19 slides parsed with titles, layouts, and speaker notes).
+  - Verified JSON-RPC `initialize`, `slidev-get-info`, and `slidev-list-slides` over stdio via `npx --prefix docs/presentation slidev mcp docs/presentation/slides.md` (all 19 slides of the first deck version parsed with titles, layouts, and speaker notes; not re-run on the reworked 24-slide deck).
   - `npm --prefix docs/presentation run build` succeeded cleanly in `1.07s`.
   - `make slides-export` verified on the local host (rendered `docs/presentation/slides-export.pdf` via `playwright-chromium`).
 
