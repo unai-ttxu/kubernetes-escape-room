@@ -200,7 +200,7 @@ make validate
 
 # Individual validation targets
 make lint          # shellcheck scripts/escape-room.sh scenarios/*/verify.sh
-make check         # verify chmod 750 and no hardcoded /Users/ or /home/ paths
+make check         # enforce chmod 750 (git only tracks 755, so it re-applies 750) and no hardcoded /Users/ or /home/ paths
 ```
 
 ### Smoke-testing a scenario

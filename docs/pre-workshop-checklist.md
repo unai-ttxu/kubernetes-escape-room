@@ -78,7 +78,7 @@ Register the server in your MCP client configuration:
   "mcpServers": {
     "k8s-escape-room": {
       "command": "npx",
-      "args": ["-y", "kubernetes-mcp-server@latest", "--config", "mcp-config.toml"],
+      "args": ["-y", "kubernetes-mcp-server@0.0.69", "--config", "mcp-config.toml"],
       "env": { "KUBECONFIG": "kind/.kube/config" }
     }
   }

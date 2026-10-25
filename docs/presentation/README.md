@@ -93,6 +93,8 @@ Slidev ships a built-in MCP server that exposes structured slide-level operation
 
 Because the Slidev `package.json` lives in `docs/presentation/` (keeping the repository root clean for the Bash harness), `npx` uses `--prefix docs/presentation` to resolve the local `@slidev/cli` binary (`slidev`) and targets `docs/presentation/slides.md`.
 
+> **Prerequisite:** run `make setup-dev` (or `npm --prefix docs/presentation install`) first. Without `docs/presentation/node_modules`, the MCP server fails to start (`CONNECTION_CLOSED`).
+
 This configuration is already checked into:
 - `.agents/plugins/slidev/mcp_config.json` (auto-discovered by **Antigravity**)
 - `.mcp.json` (used by **Claude Code**, **Cursor**, and standard MCP clients)

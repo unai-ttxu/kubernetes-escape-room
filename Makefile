@@ -4,7 +4,7 @@
 	setup cleanup start status hint ai-assist verify solve reset \
 	test
 
-SHELL := /usr/bin/env bash
+SHELL := bash
 HARNESS := ./scripts/escape-room.sh
 SLIDES_DIR := docs/presentation
 LEVEL ?= level-01
@@ -35,14 +35,12 @@ setup-dev: ## Install contributor/dev requirements (shellcheck, Slidev & Playwri
 	@echo "→ Installing Playwright Chromium for PDF export..."
 	npx --prefix $(SLIDES_DIR) playwright install chromium
 
-slides: ## Build and start the live-reloading Slidev presentation server (http://localhost:3030)
+slides: ## Start the live-reloading Slidev presentation server (http://localhost:3030)
 	@test -d $(SLIDES_DIR)/node_modules || $(MAKE) setup-dev
-	npm --prefix $(SLIDES_DIR) run build
 	npm --prefix $(SLIDES_DIR) run dev
 
 slides-export: ## Build and export presentation slides to PDF
 	@test -d $(SLIDES_DIR)/node_modules/playwright-chromium || $(MAKE) setup-dev
-	npx --prefix $(SLIDES_DIR) playwright install chromium
 	npm --prefix $(SLIDES_DIR) run build
 	npm --prefix $(SLIDES_DIR) run export
 
@@ -51,12 +49,12 @@ slides-export: ## Build and export presentation slides to PDF
 lint: ## Run shellcheck on escape-room.sh and all scenario verify.sh scripts
 	shellcheck $(HARNESS) scenarios/*/verify.sh
 
-check: ## Verify script permissions (chmod 750) and no hardcoded user home paths
+check: ## Enforce script permissions (chmod 750; git only tracks 755) and no hardcoded user home paths
 	@for f in $(HARNESS) scenarios/*/verify.sh; do \
 		perm="$$(stat -f '%Lp' "$$f" 2>/dev/null || stat -c '%a' "$$f")"; \
 		if [[ "$$perm" != "750" ]]; then \
-			echo "✗ $$f has permissions $$perm (expected 750)"; \
-			exit 1; \
+			echo "→ $$f has permissions $$perm; setting 750 (git only tracks the executable bit)"; \
+			chmod 750 "$$f"; \
 		fi; \
 	done
 	@echo "✓ All executable scripts have 750 permissions."
@@ -101,7 +99,7 @@ reset: ## Re-inject the active level's broken state
 
 # ─── End-to-End Level Smoke Testing ───────────────────────────────────────────
 
-test: ## Smoke-test a level or all levels (make test LEVEL=level-01 or LEVEL=all)
+test: ## DESTRUCTIVE: smoke-test levels, resets .room-state (make test LEVEL=level-01 or LEVEL=all)
 	@levels="$(LEVEL)"; \
 	if [[ "$$levels" == "all" ]]; then \
 		levels="$(ALL_LEVELS)"; \

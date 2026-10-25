@@ -26,7 +26,7 @@ Complete Milestone 6 by:
 | [`.agents/skills/slidev/`](../../.agents/skills/slidev/), [`skills-lock.json`](../../skills-lock.json) | Official `slidevjs/slidev` agent skill and lockfile |
 | [`.agents/plugins/slidev/plugin.json`](../../.agents/plugins/slidev/plugin.json), [`mcp_config.json`](../../.agents/plugins/slidev/mcp_config.json), [`.mcp.json`](../../.mcp.json) | Slidev MCP server configuration for Antigravity and standard CLI/IDE MCP clients |
 | [`docs/pre-workshop-checklist.md`](../pre-workshop-checklist.md) | Instructor pre-event smoke tests, attendee prerequisites, optional read-only MCP/CLI agent configs, 45–50 min pacing guide, and 5 fallback playbooks |
-| [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md) | Condensed 76-line one-page A4 SRE Copilot reference (Prompt Pattern, 5-stage loop, clean `kubectl` extraction, common K8s AI hallucinations, 6 guardrails, 4-row rubric) |
+| [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md) | Condensed 68-line one-page A4 SRE Copilot reference (Prompt Pattern, 5-stage loop, clean `kubectl` extraction, common K8s AI hallucinations, 6 guardrails, 4-row rubric) |
 | [`Makefile`](../../Makefile) | Task runner for `setup-dev`, `slides`, `slides-export`, `lint`, `check`, `validate`, cluster lifecycle commands, and `test` (`LEVEL=level-XX` or `LEVEL=all`) |
 | [`AGENTS.md`](../../AGENTS.md), [`README.md`](../../README.md), [`docs/design/plan.md`](../design/plan.md), [`docs/sessions/00-milestones.md`](00-milestones.md), [`.gitignore`](../../.gitignore) | Synchronized directory trees, build/test commands, Amendment 7, and M6 learnings |
 
@@ -52,7 +52,7 @@ Complete Milestone 6 by:
 3. **Consolidated, parameterized `Makefile`:**
    - Instead of duplicating per-level targets (`level-01`..`04`, `test-level-01`..`04`, `smoke-test`) or separate `check-perms`/`check-paths` targets, the `Makefile` uses `make start LEVEL=level-XX`, `make test LEVEL=level-XX` (or `LEVEL=all`), `make check` (permissions + relative-path audit), and `make validate` (`lint` + `check`).
 4. **Preserving section numbering in the condensed 1-page cheatsheet:**
-   - [`docs/ai-exercises.md`](../ai-exercises.md) and [`docs/ai-research-notes.md`](../ai-research-notes.md) cross-reference sections 1–5 and guardrails 1–6 of [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md). Condensing the cheatsheet to 76 lines while retaining all 5 section numbers ensures zero broken cross-references.
+   - [`docs/ai-exercises.md`](../ai-exercises.md) and [`docs/ai-research-notes.md`](../ai-research-notes.md) cross-reference sections 1–5 and guardrails 1–6 of [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md). Condensing the cheatsheet to 68 lines while retaining all 5 section numbers ensures zero broken cross-references.
 
 ---
 
