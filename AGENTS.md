@@ -107,7 +107,9 @@ kubernetes-escape-room/
     ├── presentation/
     │   ├── README.md                # Contributor guide for Slidev & MCP setup
     │   ├── package.json             # Slidev dependencies & scripts
-    │   └── slides.md                # Workshop presentation deck (M6)
+    │   ├── slides.md                # Workshop presentation deck (M6)
+    │   ├── style.css                # Deck theme (colors, cards, chips)
+    │   └── setup/mermaid.ts         # Mermaid diagram theme
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
     │   ├── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup
@@ -332,7 +334,7 @@ exit 0
 
 ### Presentation & `Makefile` rules (learned from M6)
 
-- **Subdirectory isolation (`docs/presentation/`):** Keep Slidev's `package.json`, `package-lock.json`, and `slides.md` inside `docs/presentation/` so the repository root remains free of Node.js runtime dependencies for attendees running `./scripts/escape-room.sh`.
+- **Subdirectory isolation (`docs/presentation/`):** Keep Slidev's `package.json` and `slides.md` (the generated `package-lock.json` is gitignored) inside `docs/presentation/` so the repository root remains free of Node.js runtime dependencies for attendees running `./scripts/escape-room.sh`.
 - **`npx` MCP binary resolution (`--prefix docs/presentation`):** On npm, the Slidev CLI package is `@slidev/cli` (which installs the local `slidev` binary into `docs/presentation/node_modules/.bin/slidev`); there is no standalone `slidev` package on the npm registry. Consequently, any MCP configuration or command executed from the repository root **must** pass `--prefix docs/presentation` (`npx --prefix docs/presentation slidev mcp docs/presentation/slides.md`).
 - **Slidev PDF export prerequisites (`playwright-chromium`):** `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. `make setup-dev` installs both (and restores the pinned agent skills from `skills-lock.json`); `make slides-export` runs `setup-dev` if the dependencies are missing and builds the deck (`slidev build`) before exporting.
 - **Root `Makefile` conventions:** Keep `Makefile` targets concise and parameterized (`make start LEVEL=level-XX`, `make test LEVEL=level-XX` or `LEVEL=all`, `make setup-dev`, `make slides`, `make slides-export`, `make lint`, `make check`, `make validate`) rather than duplicating per-level targets.
@@ -417,5 +419,6 @@ node_modules/
 docs/presentation/dist/
 docs/presentation/.slidev/
 docs/presentation/slides-export.pdf
+docs/presentation/package-lock.json
 .agents/skills/
 ```

@@ -77,7 +77,9 @@ kubernetes-escape-room/
     ├── presentation/
     │   ├── README.md                # Slidev + MCP contributor guide
     │   ├── package.json             # Slidev dependencies & scripts
-    │   └── slides.md                # Workshop presentation deck (M6)
+    │   ├── slides.md                # Workshop presentation deck (M6)
+    │   ├── style.css                # Deck theme (colors, cards, chips)
+    │   └── setup/mermaid.ts         # Mermaid diagram theme
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
     │   ├── 01-milestone-01.md       # Session 1: Core harness & cluster setup

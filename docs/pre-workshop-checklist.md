@@ -160,12 +160,12 @@ Run this deterministic smoke test from the repository root to verify the harness
 
 | Time | Segment | Facilitator Action |
 | :--- | :--- | :--- |
-| `00:00–05:00` | **Briefing & AI Workflow** | Present Slides 1–8: CLI commands, 5-stage evidence loop, 6 guardrails |
-| `05:00–15:00` | **Level 01: The Ghost Image** | Attendees run `start level-01`. Compare vague prompt vs pasting `describe pod` Events (Slides 9–10) |
-| `15:00–30:00` | **Level 02: The Crashing Config** | Attendees run `start level-02`. Highlight compound faults: `KeyError` in logs + `OOMKilled` in `describe` (Slides 11–12) |
-| `30:00–45:00` | **Level 03: The Silent Wall** | Attendees run `start level-03`. Run the 5-min **Challenge the AI's Hypothesis** exercise (`504` vs `502`, ClusterIP vs Pod IP) (Slides 13–15) |
-| *Optional* | **Bonus Level 04: Ghost Microservices** | Fast finishers run `start level-04` (`5,000`-line log haystack + `grep -A 5 -E "ERROR\|Exception"`) (Slides 16–17) |
-| `45:00–50:00` | **Debrief & Rubric** | Score AI assistance with the 4-criterion rubric and run `./scripts/escape-room.sh cleanup` (Slides 18–19) |
+| `00:00–10:00` | **Talk: incidents, then vs now, AI best practices & tooling** | Present Slides 1–16: incident lifecycle, 5-stage evidence loop, guardrails, tooling tiers (`k8sgpt`, MCP, CLI agents), sharing skills/MCP; Slide 18 for the harness |
+| `10:00–20:00` | **Level 01: The Ghost Image** | Attendees run `start level-01`. Compare vague prompt vs pasting `describe pod` Events (Slides 19–20) |
+| `20:00–33:00` | **Level 02: The Crashing Config** | Attendees run `start level-02`. Highlight compound faults: `KeyError` in logs + `OOMKilled` in `describe` (Slides 21–22) |
+| `33:00–46:00` | **Level 03: The Silent Wall** | Attendees run `start level-03`. Run the 5-min **Challenge the AI's Hypothesis** exercise (`504` vs `502`, ClusterIP vs Pod IP) (Slides 23–25) |
+| `46:00–50:00` | **Debrief & Rubric** | Score AI assistance with the 4-criterion rubric, announce Level 04 as a take-home, and run `./scripts/escape-room.sh cleanup` (Slides 26–27) |
+| *Take-home* | **Level 04: Ghost Microservices** | Not presented in the deck. Fast finishers or attendees run `start level-04` (`5,000`-line log haystack + `grep -A 5 -E "ERROR\|Exception"`) |
 
 ---
 

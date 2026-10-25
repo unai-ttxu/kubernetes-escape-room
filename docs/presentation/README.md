@@ -22,8 +22,9 @@ kubernetes-escape-room/
     └── presentation/
         ├── README.md                     # ← You are here
         ├── package.json                  # Slidev + playwright-chromium dependencies & scripts
-        ├── package-lock.json             # Locked dependency versions
-        └── slides.md                     # Main presentation deck
+        ├── slides.md                     # Main presentation deck
+        ├── style.css                     # Shared theme (colors, cards, chips)
+        └── setup/mermaid.ts              # Mermaid diagram theme
 ```
 
 ---

@@ -9,7 +9,7 @@
 ## 🎯 Objectives
 
 Complete Milestone 6 by:
-1. Configuring the [Slidev](https://sli.dev) presentation environment (`docs/presentation/`), the `slidevjs/slidev` agent skill (`.agents/skills/slidev/`), and the Slidev MCP server (`.agents/plugins/slidev/mcp_config.json` and `.mcp.json`), and authoring the 19-slide workshop presentation deck (`docs/presentation/slides.md`).
+1. Configuring the [Slidev](https://sli.dev) presentation environment (`docs/presentation/`), the `slidevjs/slidev` agent skill (`.agents/skills/slidev/`), and the Slidev MCP server (`.agents/plugins/slidev/mcp_config.json` and `.mcp.json`), and authoring the 27-slide workshop presentation deck (`docs/presentation/slides.md`).
 2. Creating [`docs/pre-workshop-checklist.md`](../pre-workshop-checklist.md) covering attendee prerequisites, optional AI copilot tiers, instructor 48h/30m readiness checks, pacing, and fallback playbooks.
 3. Condensing [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md) into a printable one-page A4 reference while preserving all 5 numbered sections referenced by [`docs/ai-exercises.md`](../ai-exercises.md) and [`docs/ai-research-notes.md`](../ai-research-notes.md).
 4. Adding a root [`Makefile`](../../Makefile) to automate contributor setup (`setup-dev`), presentation preview/export (`slides`, `slides-export`), static validations (`lint`, `check`, `validate`), and scenario execution/smoke testing (`start`, `test`).
@@ -20,8 +20,9 @@ Complete Milestone 6 by:
 
 | File | Purpose |
 | :--- | :--- |
-| [`docs/presentation/slides.md`](../presentation/slides.md) | 19-slide Slidev deck covering Mission Briefing, 5-stage AI Copilot workflow, 6 Guardrails, Levels 01–04 briefings & debriefs, the Level 03 Challenge-the-AI-Hypothesis exercise, and the 4-criterion evaluation rubric |
-| [`docs/presentation/package.json`](../presentation/package.json), [`package-lock.json`](../presentation/package-lock.json) | Slidev (`@slidev/cli`, `@slidev/theme-default`, `vue`) and PDF export (`playwright-chromium`) dependencies |
+| [`docs/presentation/slides.md`](../presentation/slides.md) | 27-slide Slidev deck: incident management context, troubleshooting then vs now, AI best practices (5-stage loop, guardrails, tooling tiers incl. `k8sgpt`, MCP, sharing skills), Levels 01–03 briefings & debriefs, the Level 03 Challenge-the-AI-Hypothesis exercise, and the rubric (Level 04 is a take-home) |
+| [`docs/presentation/package.json`](../presentation/package.json) | Slidev (`@slidev/cli`, `@slidev/theme-default`, `vue`) and PDF export (`playwright-chromium`) dependencies |
+| [`docs/presentation/style.css`](../presentation/style.css), [`docs/presentation/setup/mermaid.ts`](../presentation/setup/mermaid.ts) | Deck theme and Mermaid diagram theme |
 | [`docs/presentation/README.md`](../presentation/README.md) | Contributor guide for running Slidev locally, using the `slidev` skill, and configuring the Slidev MCP server |
 | [`skills-lock.json`](../../skills-lock.json) | Pins the official `slidevjs/slidev` agent skill; files in `.agents/skills/` are gitignored and restored by `make setup-dev` (or `npx skills experimental_install`) |
 | [`.agents/plugins/slidev/plugin.json`](../../.agents/plugins/slidev/plugin.json), [`mcp_config.json`](../../.agents/plugins/slidev/mcp_config.json), [`.mcp.json`](../../.mcp.json) | Slidev MCP server configuration for Antigravity and standard CLI/IDE MCP clients |
