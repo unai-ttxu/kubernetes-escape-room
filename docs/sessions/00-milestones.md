@@ -236,14 +236,24 @@ scenarios/*/ai-assist.md        # Attendee AI tip per level, shown by `./scripts
 
 ## Milestone 6 — Workshop Docs & Pre-Event Readiness
 
-**Status:** ⬜ Not started  
+**Status:** 🔍 In review (human sign-off pending)  
 **Depends on:** M5 complete
 
 **Deliverables:**
 ```
+Makefile                            # Task runner (setup-dev, slides, slides-export, lint, check, validate, test)
+.mcp.json                           # Root Slidev MCP server config
+skills-lock.json                    # Agent skills lockfile
+.agents/
+├── skills/slidev/                  # Slidev presentation skill (SKILL.md + references/)
+└── plugins/slidev/                 # Antigravity workspace plugin (plugin.json + mcp_config.json)
 docs/
-├── ai-prompts-cheatsheet.md    # One-page A4 condensed version of the M5 content
-└── pre-workshop-checklist.md   # Instructor setup & attendee prereqs
+├── ai-prompts-cheatsheet.md        # One-page A4 condensed version of the M5 content
+├── pre-workshop-checklist.md       # Instructor setup, attendee prereqs & fallback playbooks
+└── presentation/
+    ├── README.md                   # Contributor guide for Slidev & MCP server setup
+    ├── package.json                # Slidev + playwright-chromium dependencies & scripts
+    └── slides.md                   # Full 19-slide workshop presentation deck
 ```
 
 **`pre-workshop-checklist.md` must cover:**
