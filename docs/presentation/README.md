@@ -33,13 +33,13 @@ kubernetes-escape-room/
 From the **repository root** (using `make` or `npm`):
 
 ```bash
-# 1. Install dev & presentation dependencies (shellcheck, Slidev packages & Playwright Chromium)
+# 1. Install dev & presentation dependencies (shellcheck, Slidev packages, Playwright Chromium & the pinned agent skills)
 make setup-dev
 
-# 2. Verify build and start the live-reloading Slidev dev server (http://localhost:3030)
+# 2. Start the live-reloading Slidev dev server (http://localhost:3030)
 make slides
 
-# 3. Verify build and export deck to PDF (docs/presentation/slides-export.pdf)
+# 3. Build and export deck to PDF (docs/presentation/slides-export.pdf)
 make slides-export
 ```
 
@@ -76,7 +76,7 @@ Contributors can author, inspect, reorder, and update slides using AI agents pow
 
 The [Slidev skill](https://github.com/slidevjs/slidev) gives AI agents reference documentation on Slidev Markdown syntax, headmatter, layouts, code highlighting, Mermaid diagrams, click animations, and the built-in MCP server.
 
-The skill files are **not committed** (`.agents/skills/` is gitignored); only `skills-lock.json` is tracked. Restore the pinned version at the repository root with:
+The skill files are **not committed** (`.agents/skills/` is gitignored); only `skills-lock.json` is tracked. `make setup-dev` restores the pinned version automatically. To restore it on its own, run this at the repository root:
 
 ```bash
 npx skills experimental_install

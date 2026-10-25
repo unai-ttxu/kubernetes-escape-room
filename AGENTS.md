@@ -135,7 +135,7 @@ docker --version       # Docker Desktop
 kind --version         # >= 0.20.0
 kubectl version        # >= 1.28
 
-# Optional contributor/instructor setup (installs shellcheck, Slidev & Playwright Chromium)
+# Optional contributor/instructor setup (installs shellcheck, Slidev, Playwright Chromium & restores the pinned agent skills)
 make setup-dev
 ```
 
@@ -334,7 +334,7 @@ exit 0
 
 - **Subdirectory isolation (`docs/presentation/`):** Keep Slidev's `package.json`, `package-lock.json`, and `slides.md` inside `docs/presentation/` so the repository root remains free of Node.js runtime dependencies for attendees running `./scripts/escape-room.sh`.
 - **`npx` MCP binary resolution (`--prefix docs/presentation`):** On npm, the Slidev CLI package is `@slidev/cli` (which installs the local `slidev` binary into `docs/presentation/node_modules/.bin/slidev`); there is no standalone `slidev` package on the npm registry. Consequently, any MCP configuration or command executed from the repository root **must** pass `--prefix docs/presentation` (`npx --prefix docs/presentation slidev mcp docs/presentation/slides.md`).
-- **Slidev PDF export prerequisites (`playwright-chromium`):** `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. Both `make setup-dev` and `make slides-export` ensure these are present and verify the deck builds (`slidev build`) before launching or exporting.
+- **Slidev PDF export prerequisites (`playwright-chromium`):** `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. `make setup-dev` installs both (and restores the pinned agent skills from `skills-lock.json`); `make slides-export` runs `setup-dev` if the dependencies are missing and builds the deck (`slidev build`) before exporting.
 - **Root `Makefile` conventions:** Keep `Makefile` targets concise and parameterized (`make start LEVEL=level-XX`, `make test LEVEL=level-XX` or `LEVEL=all`, `make setup-dev`, `make slides`, `make slides-export`, `make lint`, `make check`, `make validate`) rather than duplicating per-level targets.
 
 ---

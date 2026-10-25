@@ -34,8 +34,8 @@ All levels run locally via a single CLI tool (or via `make` shortcuts):
 For instructors and contributors, `Makefile` also provides presentation and validation workflows:
 
 ```bash
-make setup-dev          # install contributor deps (shellcheck, Slidev, Playwright Chromium)
-make slides             # build and launch the live Slidev presentation (http://localhost:3030)
+make setup-dev          # install contributor deps (shellcheck, Slidev, Playwright Chromium, agent skills)
+make slides             # launch the live Slidev presentation (http://localhost:3030)
 make slides-export      # build and export the presentation deck to PDF
 make validate           # run shellcheck + permission (750) + relative-path checks
 make test LEVEL=all     # run end-to-end smoke tests across all 4 levels (or LEVEL=level-01)

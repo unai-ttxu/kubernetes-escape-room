@@ -23,7 +23,7 @@ Complete Milestone 6 by:
 | [`docs/presentation/slides.md`](../presentation/slides.md) | 19-slide Slidev deck covering Mission Briefing, 5-stage AI Copilot workflow, 6 Guardrails, Levels 01–04 briefings & debriefs, the Level 03 Challenge-the-AI-Hypothesis exercise, and the 4-criterion evaluation rubric |
 | [`docs/presentation/package.json`](../presentation/package.json), [`package-lock.json`](../presentation/package-lock.json) | Slidev (`@slidev/cli`, `@slidev/theme-default`, `vue`) and PDF export (`playwright-chromium`) dependencies |
 | [`docs/presentation/README.md`](../presentation/README.md) | Contributor guide for running Slidev locally, using the `slidev` skill, and configuring the Slidev MCP server |
-| [`skills-lock.json`](../../skills-lock.json) | Pins the official `slidevjs/slidev` agent skill; files in `.agents/skills/` are gitignored and restored with `npx skills experimental_install` |
+| [`skills-lock.json`](../../skills-lock.json) | Pins the official `slidevjs/slidev` agent skill; files in `.agents/skills/` are gitignored and restored by `make setup-dev` (or `npx skills experimental_install`) |
 | [`.agents/plugins/slidev/plugin.json`](../../.agents/plugins/slidev/plugin.json), [`mcp_config.json`](../../.agents/plugins/slidev/mcp_config.json), [`.mcp.json`](../../.mcp.json) | Slidev MCP server configuration for Antigravity and standard CLI/IDE MCP clients |
 | [`docs/pre-workshop-checklist.md`](../pre-workshop-checklist.md) | Instructor pre-event smoke tests, attendee prerequisites, optional read-only MCP/CLI agent configs, 45–50 min pacing guide, and 5 fallback playbooks |
 | [`docs/ai-prompts-cheatsheet.md`](../ai-prompts-cheatsheet.md) | Condensed 68-line one-page A4 SRE Copilot reference (Prompt Pattern, 5-stage loop, clean `kubectl` extraction, common K8s AI hallucinations, 6 guardrails, 4-row rubric) |
@@ -48,7 +48,7 @@ Complete Milestone 6 by:
      }
      ```
 2. **Slidev PDF export prerequisites (`playwright-chromium`):**
-   - `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. Both `make setup-dev` and `make slides-export` ensure these are installed and run `slidev build` before starting or exporting.
+   - `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. `make setup-dev` installs both (and restores the pinned agent skills); `make slides-export` runs `setup-dev` if they are missing and runs `slidev build` before exporting.
 3. **Consolidated, parameterized `Makefile`:**
    - Instead of duplicating per-level targets (`level-01`..`04`, `test-level-01`..`04`, `smoke-test`) or separate `check-perms`/`check-paths` targets, the `Makefile` uses `make start LEVEL=level-XX`, `make test LEVEL=level-XX` (or `LEVEL=all`), `make check` (permissions + relative-path audit), and `make validate` (`lint` + `check`).
 4. **Preserving section numbering in the condensed 1-page cheatsheet:**

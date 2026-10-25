@@ -19,7 +19,7 @@ help: ## Show this help menu
 
 # ─── Contributor & Presentation Setup ─────────────────────────────────────────
 
-setup-dev: ## Install contributor/dev requirements (shellcheck, Slidev & Playwright)
+setup-dev: ## Install contributor/dev requirements (shellcheck, Slidev, Playwright & agent skills)
 	@if ! command -v shellcheck >/dev/null 2>&1; then \
 		if command -v brew >/dev/null 2>&1; then \
 			echo "→ Installing shellcheck via Homebrew..."; \
@@ -34,6 +34,8 @@ setup-dev: ## Install contributor/dev requirements (shellcheck, Slidev & Playwri
 	npm --prefix $(SLIDES_DIR) install
 	@echo "→ Installing Playwright Chromium for PDF export..."
 	npx --prefix $(SLIDES_DIR) playwright install chromium
+	@echo "→ Restoring pinned agent skills from skills-lock.json..."
+	@npx --yes skills experimental_install || echo "⚠ Could not restore agent skills; run 'npx skills experimental_install' manually."
 
 slides: ## Start the live-reloading Slidev presentation server (http://localhost:3030)
 	@test -d $(SLIDES_DIR)/node_modules || $(MAKE) setup-dev
