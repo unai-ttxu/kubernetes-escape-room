@@ -65,7 +65,7 @@ Checks run:
   - All executable scripts verified at `chmod 750` (`-rwxr-x---`).
   - Relative-path audit confirmed 0 hardcoded `/Users/<name>` or `/home/<name>` paths across all repository files.
 - Slidev MCP server, build & PDF export verification:
-  - Verified JSON-RPC `initialize`, `slidev-get-info`, and `slidev-list-slides` over stdio via `npx --prefix docs/presentation slidev mcp docs/presentation/slides.md` (all 19 slides of the first deck version parsed with titles, layouts, and speaker notes; not re-run on the reworked 24-slide deck).
+  - Verified JSON-RPC `initialize`, `slidev-get-info`, and `slidev-list-slides` over stdio via `npx --prefix docs/presentation slidev mcp docs/presentation/slides.md` (all 24 slides of the reworked deck parsed with titles, layouts, and speaker notes).
   - `npm --prefix docs/presentation run build` succeeded cleanly in `1.07s`.
   - `make slides-export` verified on the local host (rendered `docs/presentation/slides-export.pdf` via `playwright-chromium`).
 

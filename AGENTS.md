@@ -187,7 +187,7 @@ make setup-dev
 ### Presentation (`Slidev`)
 
 ```bash
-# Build and start the live-reloading Slidev server (http://localhost:3030)
+# Start the live-reloading Slidev server (http://localhost:3030)
 make slides
 
 # Build and export the presentation to PDF (docs/presentation/slides-export.pdf)
