@@ -56,7 +56,7 @@ kubernetes-escape-room/
 ├── skills-lock.json                 # Agent skills lockfile
 ├── .agents/
 │   ├── skills/
-│   │   └── slidev/                  # Slidev presentation skill (SKILL.md + references/)
+│   │   └── slidev/                  # Slidev skill (gitignored; restore: npx skills experimental_install)
 │   └── plugins/
 │       └── slidev/                  # Antigravity workspace plugin (plugin.json + mcp_config.json)
 ├── scripts/

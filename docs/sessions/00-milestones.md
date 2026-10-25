@@ -245,7 +245,7 @@ Makefile                            # Task runner (setup-dev, slides, slides-exp
 .mcp.json                           # Root Slidev MCP server config
 skills-lock.json                    # Agent skills lockfile
 .agents/
-├── skills/slidev/                  # Slidev presentation skill (SKILL.md + references/)
+├── skills/slidev/                  # Slidev skill (gitignored; restored from skills-lock.json)
 └── plugins/slidev/                 # Antigravity workspace plugin (plugin.json + mcp_config.json)
 docs/
 ├── ai-prompts-cheatsheet.md        # One-page A4 condensed version of the M5 content
