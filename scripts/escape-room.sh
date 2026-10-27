@@ -359,7 +359,6 @@ cmd_prepare() {
   done
 
   print_banner "${GREEN}" "✅  Prepare complete — images cached, cluster ready"
-  echo -e "  Run ${BOLD}make start LEVEL=level-01${NC} to begin."
   echo ""
 }
 
