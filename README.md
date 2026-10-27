@@ -5,7 +5,7 @@
 A hands-on workshop for Platform, SRE, and Software Engineers. Teams race to diagnose and fix intentionally broken Kubernetes scenarios, using AI copilots, CLI agents, and agentic harnesses as their debugging partners.
 
 > [!WARNING]
-> **Vibe-coded, on purpose.** Parts of this repository were vibe coded with AI tools as an experiment: we wanted to see how far an AI-assisted approach gets us when preparing this workshop. As SREs, we would never ship this way to production, but for a workshop we are keeping it relaxed. Treat the code as a fun experiment and review it before reusing it anywhere that matters. 😄
+> **Partially vibe-coded, on purpose.** Parts of this repository were vibe coded with AI tools as an experiment: we wanted to see how far an AI-assisted approach gets us when preparing this workshop. As SREs, we would never ship this way to production, but for a workshop we are keeping it relaxed. Treat the code as a fun experiment and review it before reusing it anywhere that matters. 😄
 
 ---
 
