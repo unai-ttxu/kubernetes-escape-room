@@ -21,6 +21,7 @@ All levels run locally via a single CLI tool (or via `make` shortcuts):
 
 ```bash
 ./scripts/escape-room.sh setup          # spin up a Kind cluster (or: make setup)
+./scripts/escape-room.sh prepare        # setup + pre-pull all images + build app images (or: make prepare)
 ./scripts/escape-room.sh start level-01 # inject the broken scenario (or: make start LEVEL=level-01)
 ./scripts/escape-room.sh status         # check active level & pod statuses (or: make status)
 ./scripts/escape-room.sh hint           # get a progressive hint (or: make hint)

@@ -307,6 +307,89 @@ build_app_image() {
   echo -e "${GREEN}✓ Image loaded into the cluster.${NC}"
 }
 
+# ─── Command: prepare ─────────────────────────────────────────────────────────
+
+# Prints every image the cluster pulls at runtime (`image:`/`--image=` references in
+# scenarios/ manifests, verify.sh and docs), one per line. Cilium images are not
+# listed: `setup` already pulls them inside the node. Locally built images
+# (escape-room/*) are skipped; they are built by build_app_image.
+discover_images() {
+  grep -rhoE --exclude-dir=node_modules '(image[:=]|--image=)[[:space:]]*"?[A-Za-z0-9][^[:space:]"'"'"'$`]*' \
+    "${SCENARIOS_DIR}" 2> /dev/null \
+    | sed -E 's/^(image[:=]|--image=)[[:space:]]*"?//' \
+    | grep -vE '^escape-room/' | sort -u
+}
+
+# Prints the base images of scenario Dockerfiles (FROM lines), one per line.
+# They are only needed on the host to build the app images, never in the cluster.
+discover_base_images() {
+  grep -rhE '^FROM[[:space:]]' --include=Dockerfile "${SCENARIOS_DIR}" 2> /dev/null \
+    | awk '{print $2}' | sort -u
+}
+
+# Loads an image into the kind node. `kind load docker-image` fails with
+# "content digest ... not found" on multi-arch images when Docker uses the
+# containerd image store (it imports --all-platforms), so fall back to piping
+# `docker save` into ctr, which imports only the platforms actually present.
+load_image() {
+  local image="$1" node="${CLUSTER_NAME}-control-plane"
+  kind load docker-image "${image}" --name "${CLUSTER_NAME}" > /dev/null 2>&1 && return 0
+  docker save "${image}" \
+    | docker exec --privileged -i "${node}" ctr --namespace=k8s.io images import \
+      --digests --snapshotter=overlayfs - > /dev/null 2>&1
+}
+
+# Pulls Dockerfile base images on the host only, then pulls every runtime image
+# and loads it into the kind node, so no registry access is needed during the workshop. Pull failures are warnings:
+# level-01 intentionally references an image that does not exist.
+preload_images() {
+  local image failed=()
+  while IFS= read -r image; do
+    [[ -n "${image}" ]] || continue
+    echo -e "${CYAN}→ ${image} (build base, host only)${NC}"
+    docker pull -q "${image}" > /dev/null 2>&1 || failed+=("${image}")
+  done < <(discover_base_images)
+
+  while IFS= read -r image; do
+    [[ -n "${image}" ]] || continue
+    echo -e "${CYAN}→ ${image}${NC}"
+    if ! docker pull -q "${image}" > /dev/null 2>&1; then
+      failed+=("${image}")
+      continue
+    fi
+    load_image "${image}" \
+      || echo -e "${YELLOW}  ⚠ pulled but could not load into the cluster${NC}"
+  done < <(discover_images)
+
+  if [[ "${#failed[@]}" -gt 0 ]]; then
+    echo -e "${YELLOW}⚠ Could not pull (expected for intentionally broken images):${NC}"
+    printf '  - %s\n' "${failed[@]}"
+  fi
+}
+
+cmd_prepare() {
+  print_banner "${CYAN}" "🧰  Preparing workshop environment"
+
+  cmd_setup
+
+  echo -e "${CYAN}→ Pulling and loading all scenario images...${NC}"
+  preload_images
+
+  local level dir d
+  for level in ${VALID_LEVELS}; do
+    dir=""
+    for d in "${SCENARIOS_DIR}/${level}-"*/; do
+      dir="${d}"
+      break
+    done
+    [[ -d "${dir}" ]] && build_app_image "${level}" "${dir}"
+  done
+
+  print_banner "${GREEN}" "✅  Prepare complete — images cached, cluster ready"
+  echo -e "  Run ${BOLD}make start LEVEL=level-01${NC} to begin."
+  echo ""
+}
+
 # Blocks until each deployment in "$@" rolls out (Ready pods), or exits 1 after 120s
 wait_for_deployments() {
   local namespace="$1"
@@ -728,6 +811,7 @@ cmd_usage() {
   echo ""
   echo -e "${BOLD}Commands:${NC}"
   echo -e "  ${CYAN}setup${NC}              Check prerequisites and create the Kind cluster"
+  echo -e "  ${CYAN}prepare${NC}            Setup + pre-pull/load all scenario images and build app images"
   echo -e "  ${CYAN}start LEVEL=<level>${NC} Begin a level (e.g. level-01, level-02, level-03, level-04)"
   echo -e "  ${CYAN}status${NC}             Show active scenario, pod statuses, troubleshooting tips"
   echo -e "  ${CYAN}hint${NC}               Display the next progressive hint (1 → 2 → 3)"
@@ -747,6 +831,7 @@ main() {
   local command="${1:-}"
   case "${command}" in
     setup)   cmd_setup ;;
+    prepare) cmd_prepare ;;
     start)   cmd_start "${2:-}" ;;
     status)  cmd_status ;;
     hint)    cmd_hint ;;
