@@ -324,18 +324,22 @@ discover_images() {
 }
 
 # Pulls every discovered image on the host so the download is done before the
-# workshop. Pull failures are warnings: level-01 intentionally references an
-# image that does not exist.
+# workshop. An image whose tag does not exist is skipped silently (not even listed):
+# level-01 intentionally references one and naming it would give the fix away. Any other
+# pull failure (network, auth, rate limit) is reported by name.
 pull_images() {
-  local image failed=()
+  local image output failed=()
   while IFS= read -r image; do
     [[ -n "${image}" ]] || continue
-    echo -e "${CYAN}→ ${image}${NC}"
-    docker pull -q "${image}" > /dev/null 2>&1 || failed+=("${image}")
+    if output="$(docker pull -q "${image}" 2>&1)"; then
+      echo -e "${GREEN}✓ ${image}${NC}"
+    else
+      grep -qiE 'not found|manifest unknown' <<< "${output}" || failed+=("${image}")
+    fi
   done < <(discover_images)
 
   if [[ "${#failed[@]}" -gt 0 ]]; then
-    echo -e "${YELLOW}⚠ Could not pull:${NC}"
+    echo -e "${YELLOW}⚠ Could not pull (check your network and retry):${NC}"
     printf '  - %s\n' "${failed[@]}"
   fi
 }
