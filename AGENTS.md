@@ -157,7 +157,7 @@ make setup-dev
 ### Running a level end-to-end
 
 ```bash
-# Setup + pre-pull/load every scenario image + build app images
+# Setup + pull every scenario image + build app images
 ./scripts/escape-room.sh prepare    # or: make prepare
 
 # Load and break a specific level
@@ -325,7 +325,7 @@ exit 0
 
 - `setup` checks `docker`, `kind` and `kubectl`; for a missing `docker` or `kind` it prints an install link/hint and exits `1`. A stopped Docker daemon gets a "start Docker Desktop" hint.
 - `setup` creates the cluster with `networking.disableDefaultCNI: true` (`kind/cluster-config.yaml`), then applies the pinned Cilium 1.20.2 manifest `kind/cni/cilium.yaml` and waits for the Cilium DaemonSet, operator, Hubble Relay, Hubble UI and all nodes `Ready`. Cilium enforces NetworkPolicy; kindnet does not. Regenerate the manifest with `helm template cilium cilium/cilium --version 1.20.2 --namespace kube-system --include-crds --set ipam.mode=kubernetes --set kubeProxyReplacement=false --set operator.replicas=1 --set hubble.enabled=true --set hubble.relay.enabled=true --set hubble.ui.enabled=true --set envoy.enabled=false > kind/cni/cilium.yaml` when bumping the version.
-- `prepare` runs `setup`, then discovers images dynamically and never hardcodes names: `discover_images` (runtime `image:`/`--image=` references in `scenarios/` manifests, `verify.sh` and docs; `escape-room/*` skipped; Cilium excluded because `setup` already pulls it in the node) is pulled and loaded into the kind node via `load_image`; `discover_base_images` (Dockerfile `FROM` lines) is pulled on the host only, for building. It then builds/loads every level's app image. Pull failures are warnings (level 01 intentionally references a non-existent tag).
+- `prepare` runs `setup`, then `pull_images` runs `docker pull` on the host for every image found by `discover_images` (never hardcoded: `image:`/`--image=` references in `scenarios/` manifests, `verify.sh` and docs, plus Dockerfile `FROM` lines; `escape-room/*` skipped; Cilium excluded because `setup` already pulls it). Images are only pulled, not loaded into the kind node. It then builds/loads every level's app image. Pull failures are warnings (level 01 intentionally references a non-existent tag).
 - If a cluster exists that was created with kindnet, `setup` exits `1` and asks for `cleanup` followed by `setup`.
 - `setup` writes a repo-local kubeconfig `kind/.kube/config` (dir `700`, file `600`) with `kind export kubeconfig`, on every run, so it stays in sync with the cluster. kind still updates the default `~/.kube/config` and its current-context as usual. The harness exports `KUBECONFIG` to that file (via `require_cluster` and `setup`), so every `kubectl` call, including those in `verify.sh`, targets only the escape-room cluster and never the user's current context. Each `verify.sh` pins `KUBECONFIG` to the same file and exits `1` if it is missing. `cleanup` removes `kind/.kube/` and `.room-state` (also when the cluster is already gone); `require_cluster` tells the user to run `setup` if the file is missing.
 - `start <level>` and `reset` re-break the level **and** remove it from `COMPLETED_LEVELS` in `.room-state`, so `status` never shows a broken level as completed. Only `cleanup` deletes `.room-state`.

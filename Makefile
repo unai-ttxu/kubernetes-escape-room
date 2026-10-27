@@ -78,7 +78,7 @@ setup: ## Create Kind cluster 'escape-room' and install Cilium CNI
 cleanup: ## Tear down Kind cluster and clean local state
 	$(HARNESS) cleanup
 
-prepare: ## Create cluster, pull/load every scenario image, build app images
+prepare: ## Create cluster, pull every scenario image, build app images
 	$(HARNESS) prepare
 
 start: ## Start a level (e.g., make start LEVEL=level-01)
