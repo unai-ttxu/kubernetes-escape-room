@@ -320,7 +320,7 @@ discover_images() {
       | sed -E 's/^(image[:=]|--image=)[[:space:]]*"?//'
     grep -rhE '^FROM[[:space:]]' --include=Dockerfile "${SCENARIOS_DIR}" 2> /dev/null \
       | awk '{print $2}'
-  } | grep -vE '^escape-room/' | sort -u
+  } | grep -vE '^escape-room/' | grep -vE '1.27.99-alpine'| sort -u
 }
 
 # Pulls every discovered image on the host so the download is done before the
@@ -335,7 +335,7 @@ pull_images() {
   done < <(discover_images)
 
   if [[ "${#failed[@]}" -gt 0 ]]; then
-    echo -e "${YELLOW}⚠ Could not pull (expected for intentionally broken images):${NC}"
+    echo -e "${YELLOW}⚠ Could not pull:${NC}"
     printf '  - %s\n' "${failed[@]}"
   fi
 }
