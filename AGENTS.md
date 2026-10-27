@@ -320,6 +320,8 @@ exit 0
 - **Hints are progressive:** Hint 1 = concept, Hint 2 = investigation commands (`describe`, `logs`, `events`) **without** the fix, Hint 3 = AI prompt recipe. Never put the fix command or the correct value in Hints 1–2.
 - **`incident.md` describes symptoms only:** no root cause, no "last deploy" hints, and no endpoints/paths that the workload does not actually serve.
 - **Executable scripts** must be `chmod 750`; re-check after editing with tools that reset modes.
+- **Images must be discoverable (learned from `prepare`):** write every image as a literal `image: <ref>`, `--image=<ref>` or Dockerfile `FROM <ref>`, never built from shell/template variables, so `prepare` finds and pre-pulls it. Never list images by hand in scripts or docs; add them to the scenario and let `discover_images` pick them up.
+- **Pull, don't `kind load` third-party images (learned from `prepare`):** with Docker's containerd image store, `kind load docker-image` fails on multi-arch images (`ctr: content digest ... not found`). Only locally built `escape-room/*` images are loaded; everything else is pulled by the node (or pre-pulled on the host). Do not silence stderr when debugging such failures.
 
 ### Harness behaviour (`scripts/escape-room.sh`)
 

@@ -106,7 +106,7 @@ kind --version     # >= 0.20.0
 kubectl version    # >= 1.28
 ```
 
-`./scripts/escape-room.sh setup` checks these for you and prints an install link if `docker` or `kind` is missing. `setup` also installs Cilium (needed so Level 03's NetworkPolicy is enforced), so the first run pulls extra images and takes a few minutes longer. It writes a repo-local kubeconfig, `kind/.kube/config`, which the CLI uses for every `kubectl` call, so your current kubectl context is never touched. A cluster created before Cilium was added must be recreated: `cleanup`, then `setup`. After a level is verified, the CLI shows the next step (e.g. `start level-02`); use `start <level>` to move between levels.
+`./scripts/escape-room.sh setup` checks these for you and prints an install link if `docker` or `kind` is missing. `setup` also installs Cilium (needed so Level 03's NetworkPolicy is enforced), so the first run pulls extra images and takes a few minutes longer. It writes a repo-local kubeconfig, `kind/.kube/config`, which the CLI uses for every `kubectl` call, so your current kubectl context is never touched. Workshop assistants and attendees can run `prepare` ahead of time: it runs `setup`, pulls every image used by the scenarios (found dynamically in `scenarios/`) and builds the app images, which confirms registry access and covers the download bandwidth before the event (pulled images stay in the host Docker cache; they are not loaded into the kind node). A cluster created before Cilium was added must be recreated: `cleanup`, then `setup`. After a level is verified, the CLI shows the next step (e.g. `start level-02`); use `start <level>` to move between levels.
 
 ---
 

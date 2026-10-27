@@ -6,7 +6,7 @@
 
 ## 1. Attendee Prerequisites (Send 48 Hours Before Event)
 
-Ask attendees to install the three required tools and run `./scripts/escape-room.sh setup` **before arriving at the venue** so container images are already cached on their laptops.
+Ask attendees to install the three required tools and run `make prepare` (or `./scripts/escape-room.sh prepare`) **before arriving at the venue** so the cluster is created, the app images are built, and every scenario image is already downloaded on their laptops (this also confirms registry access and covers the download bandwidth).
 
 ### A. Required Tools (All Attendees)
 
@@ -23,20 +23,15 @@ Ask attendees to install the three required tools and run `./scripts/escape-room
 git clone https://github.com/unai-ttxu/kubernetes-escape-room.git
 cd kubernetes-escape-room
 
-# 2. Create the Kind cluster and install the pinned Cilium 1.20.2 CNI
-#    (First run pulls Cilium & Hubble images and takes ~2–4 minutes)
-./scripts/escape-room.sh setup
+# 2. One command: create the Kind cluster (pinned Cilium 1.20.2 CNI), pull every
+#    scenario, probe and base image, and build the Level 02 / 04 app images.
+#    Images are discovered from scenarios/, so nothing needs to be listed by hand.
+#    Scenario images are only pulled to the host cache, not loaded into the node.
+#    (First run takes several minutes, depending on bandwidth)
+make prepare
 
-# 3. Pre-pull scenario & verification probe images so workshop Wi-Fi is not needed
-docker pull nginx:1.27-alpine
-docker pull python:3.12-alpine3.20
-docker pull curlimages/curl:8.11.1
-kind load docker-image nginx:1.27-alpine curlimages/curl:8.11.1 --name escape-room
-
-# 4. Pre-build local app images for Level 02 and Bonus Level 04, then reset to Level 01
-./scripts/escape-room.sh start level-02
-./scripts/escape-room.sh start level-04
-./scripts/escape-room.sh start level-01
+# 3. Optional: confirm the first level starts cleanly
+make start LEVEL=level-01
 ```
 
 > **Note on `KUBECONFIG`:** `./scripts/escape-room.sh setup` writes a repo-local kubeconfig at `kind/.kube/config` and also updates your active context to `kind-escape-room`. If you switch contexts in another terminal, run `export KUBECONFIG="$PWD/kind/.kube/config"` so your manual `kubectl` commands always target the workshop cluster.
@@ -186,7 +181,7 @@ Run this deterministic smoke test from the repository root to verify the harness
 ## 5. Troubleshooting & Fallback Playbooks
 
 ### Fallback 1: Venue Wi-Fi is Slow or Blocked During Image Pulls
-- **Symptom:** `setup` or `verify` hangs pulling `quay.io/cilium/*`, `nginx:1.27-alpine`, or `curlimages/curl:8.11.1`.
+- **Symptom:** `setup`, `prepare` or `verify` hangs pulling `quay.io/cilium/*`, `nginx:1.27-alpine`, or `curlimages/curl:8.11.1`.
 - **Fix (Offline Image Bundle):** On a machine with cached images (such as the instructor laptop), export an image archive onto a USB drive or local LAN share:
   ```bash
   docker save -o escape-room-images.tar \
