@@ -11,10 +11,13 @@ A hands-on workshop for Platform, SRE, and Software Engineers. Teams race to dia
 
 ## Prerequisites
 
+> [!NOTE]
+> **Supported platforms:** macOS and Linux distributions. Windows is not supported.
+
 | Tool | Version | Check | Install guide |
 |---|---|---|---|
-| `make` | any (GNU Make or the macOS Xcode one) | `make --version` | [GNU Make](https://www.gnu.org/software/make/) |
-| `docker` | running daemon, `>= 4 GB` RAM | `docker info` | [Docker Desktop](https://docs.docker.com/desktop/) |
+| `make` | any | `make --version` | [GNU Make](https://www.gnu.org/software/make/) |
+| `docker` | daemon running | `docker info` | [Docker Desktop](https://docs.docker.com/desktop/) (macOS) / [Docker Engine](https://docs.docker.com/engine/install/) (Linux) |
 | `kind` | `>= 0.20.0` | `kind --version` | [kind quick start](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) |
 | `kubectl` | `>= 1.28` | `kubectl version --client` | [Install tools](https://kubernetes.io/docs/tasks/tools/#kubectl) |
 
