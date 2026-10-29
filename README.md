@@ -116,13 +116,13 @@ make test LEVEL=all     # run end-to-end smoke tests across all 4 levels (or LEV
 
 ## AI plugin
 
-`plugins/k8s-troubleshooting/` bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`). Load it locally, from a scratch directory outside the repo:
+`plugins/k8s-troubleshooting/` bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`). Install it from this checkout into Claude Code and Copilot CLI (whichever you have) with:
 
 ```bash
-claude --plugin-dir "<repo-root>/plugins/k8s-troubleshooting"
+make plugin-install      # remove with: make plugin-uninstall
 ```
 
-Copilot CLI and opencode steps are in [`docs/plugin-installation.md`](docs/plugin-installation.md). Requires `npx` for the MCP server.
+Then start your CLI from a scratch directory outside the repo. opencode and manual steps are in [`docs/plugin-installation.md`](docs/plugin-installation.md). Requires `npx` for the MCP server.
 
 ---
 
@@ -134,6 +134,8 @@ kubernetes-escape-room/
 ├── README.md                        # Project overview & quickstart
 ├── Makefile                         # Task runner for slides, linting, validation & smoke tests
 ├── .mcp.json                        # Root Slidev MCP server config (CLI/IDE clients)
+├── .claude-plugin/
+│   └── marketplace.json             # Local marketplace so `make plugin-install` can install the plugin
 ├── plugins/
 │   └── k8s-troubleshooting/         # Plugin: troubleshooting skill + read-only MCP config
 │       ├── .claude-plugin/plugin.json

@@ -1,8 +1,8 @@
 # Using the `k8s-troubleshooting` plugin
 
-The plugin (`plugins/k8s-troubleshooting/`) bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied). It is loaded locally from this checkout: there is no marketplace to add.
+The plugin (`plugins/k8s-troubleshooting/`) bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied). `.claude-plugin/marketplace.json` makes this checkout a local marketplace, so `make plugin-install` installs it from disk (nothing is fetched from GitHub).
 
-For every tool: export an **absolute** `KUBECONFIG` and the plugin path from the repository root first, then start the agent from a scratch directory **outside** the repository (it would otherwise read `hints.md` and `solution/`). `npx` is required for the MCP server.
+For every tool: from the repository root, run `make plugin-install` (Claude Code and Copilot CLI, whichever are installed; `make plugin-uninstall` removes it), export an **absolute** `KUBECONFIG` and the plugin path, then start the agent from a scratch directory **outside** the repository (it would otherwise read `hints.md` and `solution/`). `npx` is required for the MCP server.
 
 ```bash
 export KUBECONFIG="$(pwd)/kind/.kube/config"
@@ -12,23 +12,24 @@ mkdir -p ~/escape-room-agent && cd ~/escape-room-agent
 
 ## Claude Code
 
-`--plugin-dir` loads the plugin for that session only, so pass it on every launch:
+`make plugin-install` runs `claude plugin install k8s-troubleshooting --marketplace "$(pwd)"` (user scope). To load it for one session without installing:
 
 ```bash
 claude --plugin-dir "$K8S_PLUGIN"
 ```
 
-Check `/plugin` (plugin loaded) and `/mcp` (`k8s-readonly` connected). Check the plugin files before a session with `claude plugin validate "$K8S_PLUGIN"`.
+Restart Claude Code, then check `/plugin` (plugin loaded) and `/mcp` (`k8s-readonly` connected). Check the plugin files before a session with `claude plugin validate "$K8S_PLUGIN"`.
 
 ## GitHub Copilot CLI
 
-Copilot CLI installs a plugin from a local path and reads its `skills/` and legacy `.mcp.json`:
+Copilot CLI reads the same `.claude-plugin/marketplace.json`, `skills/` and legacy `.mcp.json`. `make plugin-install` runs:
 
 ```bash
-copilot plugin install "$K8S_PLUGIN"
+copilot plugin marketplace add "$(pwd)"
+copilot plugin install k8s-troubleshooting@escape-room-marketplace
 ```
 
-Restart Copilot afterwards: a running session does not pick up new plugins.
+(Direct installs from a local path work but print a deprecation warning, so the marketplace form is used.) Restart Copilot afterwards: a running session does not pick up new plugins.
 
 > **Not verified:** the Copilot docs describe `${PLUGIN_ROOT}` expansion only for Agent Plugins 1.0 `mcp.json`, not for the legacy `.mcp.json` this plugin uses (`${CLAUDE_PLUGIN_ROOT}`). If `k8s-readonly` fails to start, use the manual MCP setup under opencode below.
 

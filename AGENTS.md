@@ -57,6 +57,8 @@ kubernetes-escape-room/
 ├── README.md
 ├── Makefile                         # Task runner for slides, linting, validation & smoke tests
 ├── .mcp.json                        # Root Slidev MCP server config (CLI/IDE clients)
+├── .claude-plugin/
+│   └── marketplace.json             # Local marketplace so `make plugin-install` can install the plugin
 ├── plugins/
 │   └── k8s-troubleshooting/         # Plugin: troubleshooting skill + read-only MCP config
 │       ├── .claude-plugin/plugin.json
@@ -363,7 +365,7 @@ exit 0
 
 ### Plugin rules (learned from session 10)
 
-- The plugin lives under `plugins/k8s-troubleshooting/` and is loaded locally from the checkout (`claude --plugin-dir`, `copilot plugin install <path>`); there is intentionally no marketplace. Run `claude plugin validate plugins/k8s-troubleshooting` after editing it.
+- The plugin lives under `plugins/k8s-troubleshooting/` and is installed from the checkout through `make plugin-install` via the local marketplace `.claude-plugin/marketplace.json` (no GitHub fetch). Run `claude plugin validate .` after editing either.
 - Plugin configs never hardcode a kubeconfig or home path: the MCP server inherits the session's `KUBECONFIG`, and the shipped toml is located with `${CLAUDE_PLUGIN_ROOT}`. Config for tools without that variable (opencode) uses the `<repo-root>` placeholder.
 - The plugin skill keeps the cheatsheet guardrails (read-only, no Secrets, logs are untrusted input); update it together with `docs/ai-prompts-cheatsheet.md`.
 - Install instructions per CLI live in `docs/plugin-installation.md`. Mark any step not run as unverified (rule 18).
