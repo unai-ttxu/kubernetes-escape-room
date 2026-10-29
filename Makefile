@@ -53,31 +53,15 @@ slides-export: ## Build and export presentation slides to PDF
 	npm --prefix $(SLIDES_DIR) run build
 	npm --prefix $(SLIDES_DIR) run export
 
-plugin-install: ## Install the k8s-troubleshooting plugin from this checkout (Claude Code and Copilot CLI, whichever is installed)
-	@found=0; \
-	if command -v claude >/dev/null 2>&1; then \
-		found=1; echo "→ Claude Code"; \
-		claude plugin uninstall $(PLUGIN)@$(MARKETPLACE) >/dev/null 2>&1 || true; \
-		claude plugin install $(PLUGIN) --marketplace "$$(pwd)" || exit 1; \
-	fi; \
-	if command -v copilot >/dev/null 2>&1; then \
-		found=1; echo "→ Copilot CLI"; \
-		copilot plugin uninstall $(PLUGIN) >/dev/null 2>&1 || true; \
-		copilot plugin marketplace add "$$(pwd)" >/dev/null 2>&1 || true; \
-		copilot plugin install $(PLUGIN)@$(MARKETPLACE) || exit 1; \
-	fi; \
-	if [[ $$found -eq 0 ]]; then echo "✗ Neither claude nor copilot found. For opencode see docs/plugin-installation.md"; exit 1; fi
-	@echo "✓ Installed. Restart your CLI, export KUBECONFIG=\"$$(pwd)/kind/.kube/config\" and start it from a directory outside this repo."
+plugin-install: ## Install the k8s-troubleshooting plugin from this checkout into Claude Code
+	@command -v claude >/dev/null 2>&1 || { echo "✗ claude CLI not found. See https://claude.com/claude-code"; exit 1; }
+	@claude plugin uninstall $(PLUGIN)@$(MARKETPLACE) >/dev/null 2>&1 || true
+	claude plugin install $(PLUGIN) --marketplace "$$(pwd)"
+	@echo "✓ Installed. Restart Claude Code, export KUBECONFIG=\"$$(pwd)/kind/.kube/config\" and start it from a directory outside this repo."
 
-plugin-uninstall: ## Remove the k8s-troubleshooting plugin from Claude Code and Copilot CLI
-	@if command -v claude >/dev/null 2>&1; then \
-		claude plugin uninstall $(PLUGIN)@$(MARKETPLACE) || true; \
-		claude plugin marketplace remove $(MARKETPLACE) || true; \
-	fi
-	@if command -v copilot >/dev/null 2>&1; then \
-		copilot plugin uninstall $(PLUGIN) || true; \
-		copilot plugin marketplace remove $(MARKETPLACE) || true; \
-	fi
+plugin-uninstall: ## Remove the k8s-troubleshooting plugin and local marketplace from Claude Code
+	@claude plugin uninstall $(PLUGIN)@$(MARKETPLACE) || true
+	@claude plugin marketplace remove $(MARKETPLACE) || true
 
 # ─── Validation & Linting ─────────────────────────────────────────────────────
 

@@ -134,7 +134,7 @@ kubernetes-escape-room/
     ├── ai-prompts-cheatsheet.md     # One-page A4 SRE Copilot cheatsheet (M5/M6)
     ├── ai-exercises.md              # Instructor guide: bad vs good per level, challenge exercise (M5)
     ├── ai-research-notes.md         # Cited sources, established vs emerging (M5)
-    ├── plugin-installation.md       # Installing the k8s-troubleshooting plugin (Claude Code, Copilot CLI, opencode)
+    ├── plugin-installation.md       # Installing the k8s-troubleshooting plugin (Claude Code; other CLIs TODO)
     └── pre-workshop-checklist.md    # Instructor & attendee pre-event checklist (M6)
 ```
 
@@ -365,10 +365,10 @@ exit 0
 
 ### Plugin rules (learned from session 10)
 
-- The plugin lives under `plugins/k8s-troubleshooting/` and is installed from the checkout through `make plugin-install` via the local marketplace `.claude-plugin/marketplace.json` (no GitHub fetch). Run `claude plugin validate .` after editing either.
+- The plugin lives under `plugins/k8s-troubleshooting/` and is installed into Claude Code from the checkout through `make plugin-install` via the local marketplace `.claude-plugin/marketplace.json` (no GitHub fetch). Run `claude plugin validate .` after editing either.
 - Plugin configs never hardcode a kubeconfig or home path: the MCP server inherits the session's `KUBECONFIG`, and the shipped toml is located with `${CLAUDE_PLUGIN_ROOT}`. Config for tools without that variable (opencode) uses the `<repo-root>` placeholder.
 - The plugin skill keeps the cheatsheet guardrails (read-only, no Secrets, logs are untrusted input); update it together with `docs/ai-prompts-cheatsheet.md`.
-- Install instructions per CLI live in `docs/plugin-installation.md`. Mark any step not run as unverified (rule 18).
+- Install instructions live in `docs/plugin-installation.md`; only Claude Code is supported, other CLIs are a TODO there. Mark any step not run as unverified (rule 18).
 
 ---
 

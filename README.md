@@ -116,13 +116,13 @@ make test LEVEL=all     # run end-to-end smoke tests across all 4 levels (or LEV
 
 ## AI plugin
 
-`plugins/k8s-troubleshooting/` bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`). Install it from this checkout into Claude Code and Copilot CLI (whichever you have) with:
+`plugins/k8s-troubleshooting/` bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`). Install it from this checkout into Claude Code with:
 
 ```bash
 make plugin-install      # remove with: make plugin-uninstall
 ```
 
-Then start your CLI from a scratch directory outside the repo. opencode and manual steps are in [`docs/plugin-installation.md`](docs/plugin-installation.md). Requires `npx` for the MCP server.
+Then start Claude Code from a scratch directory outside the repo. Other CLI tools (Copilot CLI, opencode) are a TODO in [`docs/plugin-installation.md`](docs/plugin-installation.md). Requires `npx` for the MCP server.
 
 ---
 
@@ -184,7 +184,7 @@ kubernetes-escape-room/
     ├── ai-prompts-cheatsheet.md     # One-page A4 SRE Copilot cheatsheet (M5/M6)
     ├── ai-exercises.md              # Instructor guide: bad vs good prompts per level, challenge exercise (M5)
     ├── ai-research-notes.md         # Cited sources on AI-assisted troubleshooting (M5)
-    ├── plugin-installation.md       # Installing the k8s-troubleshooting plugin (Claude Code, Copilot CLI, opencode)
+    ├── plugin-installation.md       # Installing the k8s-troubleshooting plugin (Claude Code; other CLIs TODO)
     └── pre-workshop-checklist.md    # Instructor & attendee pre-event checklist (M6)
 ```
 
