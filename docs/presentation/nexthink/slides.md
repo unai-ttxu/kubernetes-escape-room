@@ -63,6 +63,9 @@ layout: default
     <span class="chip">SRE at Nexthink</span>
     <p class="small pt-2">Works on the operation and improvement of <b>resilient distributed systems</b>.</p>
     <p class="small">Experience in <b>automation</b>, <b>observability</b> and <b>incident response</b>. Enjoys helping teams investigate, debug and solve complex real-world problems.</p>
+    <p class="small">
+      Fuelled by <b>matcha</b>, served plain: no milk, no sugar, no fuss. Reads ingredient labels as carefully as changelogs.
+    </p>
   </div>
 </div>
 
