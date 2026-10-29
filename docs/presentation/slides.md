@@ -29,7 +29,40 @@ AI as a copilot, not an autopilot.
 
 <!--
 Welcome attendees! Confirm everyone has cloned the repo and run `make setup`.
-Timing: talk (slides 2-13, incl. Nexthink intro) ~10 min, hands-on (14-17) ~40 min, close (18), AI debrief (19) ~5 min, follow-up resources (20), keep training (21), questions (22), hiring (23).
+Timing: talk (slides 2-14, incl. Nexthink and presenter intros) ~10 min, hands-on (15-18) ~40 min, close (19), AI debrief (20) ~5 min, follow-up resources (21), keep training (22), questions (23), hiring (24).
+-->
+
+---
+layout: default
+---
+
+<div class="kicker">Who are we?</div>
+
+# Your presenters
+
+<div class="body">
+
+<div class="grid-2">
+  <div class="card">
+    <h4><carbon-user-avatar /> Carlos Vicent</h4>
+    <span class="chip">SRE at Nexthink</span>
+    <p class="small pt-2">Leads reliability initiatives for <b>20M+ endpoints</b> across a distributed platform of <b>200+ microservices</b>.</p>
+    <p class="small">Specialises in <b>incident response automation</b> and <b>observability</b> for cloud-native environments. Big Kubernetes enthusiast and regular at DevOps, SRE and observability conferences worldwide.</p>
+  </div>
+  <div class="card">
+    <h4><carbon-user-avatar /> Unai Arrien</h4>
+    <span class="chip violet">SRE at Nexthink</span>
+    <p class="small pt-2">Works on the operation and improvement of <b>resilient distributed systems</b>.</p>
+    <p class="small">Experience in <b>automation</b>, <b>observability</b> and <b>incident response</b>. Enjoys helping teams investigate, debug and solve complex real-world problems.</p>
+  </div>
+</div>
+
+<div class="tip"><b>Tonight, together:</b> we guide the hands-on part. You investigate incidents, follow the clues and see what happens when AI becomes part of the debugging process.</div>
+
+</div>
+
+<!--
+Quick introductions, ~1 minute. Carlos: reliability for 20M+ endpoints, 200+ microservices, incident response automation and observability, Kubernetes enthusiast, regular conference attendee. Unai: resilient distributed systems, automation, observability, incident response, loves helping teams debug real-world problems. Together we run the Kubernetes Escape Room and its incidents.
 -->
 
 ---
