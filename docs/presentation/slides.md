@@ -43,7 +43,7 @@ layout: default
 <div class="steps">
   <div class="step"><b>1 · Incidents</b><span>how we manage them</span></div>
   <div class="step"><b>2 · Then vs now</b><span>troubleshooting with AI</span></div>
-  <div class="step"><b>3 · AI in practice</b><span>loop, guardrails, tooling</span></div>
+  <div class="step"><b>3 · AI in practice</b><span>prompting, guardrails, CLI &amp; MCP</span></div>
   <div class="step on"><b>4 · Escape!</b><span>Levels 01 → 03</span></div>
 </div>
 
@@ -52,8 +52,6 @@ layout: default
   <div class="card"><h4><carbon-tools /> You will see</h4><span class="small">Chat, MCP servers, CLI agents, and shared skills.</span></div>
   <div class="card"><h4><carbon-play-filled /> You will practice</h4><span class="small">Three broken scenarios, with AI helping (and sometimes misleading) you.</span></div>
 </div>
-
-<div class="tiny">Level 04 is a take-home for fast finishers.</div>
 
 </div>
 
@@ -73,8 +71,8 @@ layout: default
 
 <div class="steps">
   <div class="step"><b>Detect</b><span>alert / report</span></div>
-  <div class="step"><b>Triage</b><span>severity & owner</span></div>
-  <div class="step on"><b>Mitigate</b><span>stop the bleeding</span></div>
+  <div class="step on"><b>Triage</b><span>severity & owner</span></div>
+  <div class="step"><b>Mitigate</b><span>stop the bleeding</span></div>
   <div class="step"><b>Resolve</b><span>verified fix</span></div>
   <div class="step"><b>Learn</b><span>postmortem</span></div>
 </div>
@@ -88,48 +86,7 @@ layout: default
 </div>
 
 <!--
-Keep it short. The point: diagnosis is evidence-gathering under time pressure, exactly where a fast-but-confident assistant is tempting and risky.
--->
-
----
-layout: default
----
-
-<div class="kicker">Part 1 · Incident management</div>
-
-# What good looks like
-
-<div class="body">
-
-<div class="grid-2">
-<div class="card">
-
-#### <carbon-warning-alt /> Severity sets the response
-
-| Level | Meaning | Response |
-| :--- | :--- | :--- |
-| **SEV1** | Customer-facing outage | Page now, commander assigned |
-| **SEV2** | Degraded service | Page, work the incident |
-| **SEV3** | Minor / contained | Ticket, no page |
-
-</div>
-<div class="card">
-
-#### <carbon-notification /> A good update has 3 lines
-
-1. **Impact:** who is affected and how
-2. **Status:** what we know, what we tried
-3. **Next:** the next step and when you will update again
-
-</div>
-</div>
-
-<div class="quote">Severity levels vary by company. The habit is what matters: name the impact, name the owner, set the next update time.</div>
-
-</div>
-
-<!--
-Use your own org's severity definitions if different. The update template is also what stage 5 of the AI loop asks the copilot to draft.
+Keep it short. Triage is the focus of this talk. The point: diagnosis is evidence-gathering under time pressure, exactly where a fast-but-confident assistant is tempting and risky.
 -->
 
 ---
@@ -138,15 +95,15 @@ layout: default
 
 <div class="kicker">Part 2 · Then vs now</div>
 
-# How the debugging loop evolved
+# From manual to AI-assisted incident management
 
 <div class="body">
 
 <div class="grid-4">
-  <div class="card"><span class="chip">Then</span><h4 class="pt-2">SSH & grep</h4><span class="small">Log into the box, <code>tail</code> and <code>grep</code>. Knowledge lives in a few people's heads and a wiki page.</span></div>
-  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Dashboards & alerts</h4><span class="small">Metrics, centralized logs, tracing. More signal, more tabs, more correlation by hand.</span></div>
-  <div class="card"><span class="chip violet">Kubernetes era</span><h4 class="pt-2">kubectl & runbooks</h4><span class="small"><code>get</code>, <code>describe</code>, <code>logs</code>, <code>events</code>. Declarative state, many interacting resources.</span></div>
-  <div class="card good"><span class="chip green">Now</span><h4 class="pt-2">LLM copilots & agents</h4><span class="small">Paste evidence, get a hypothesis in seconds. Agents can even run the commands for you.</span></div>
+  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Pager & tribal knowledge</h4><span class="small">An alert wakes one person who knows the system. Runbooks live in a wiki, and context lives in people's heads.</span></div>
+  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Dashboards & war rooms</h4><span class="small">Metrics, centralized logs, tracing. More signal, more tabs, and a lot of correlation done by hand.</span></div>
+  <div class="card good"><span class="chip green">Now</span><h4 class="pt-2">AI copilots</h4><span class="small">Paste the evidence, get a summary and ranked hypotheses in seconds. Drafts updates and postmortems too.</span></div>
+  <div class="card good"><span class="chip violet">Emerging</span><h4 class="pt-2">AI agents</h4><span class="small">Agents query your tools, run read-only checks and correlate signals. A human approves every action.</span></div>
 </div>
 
 <div class="quote">Each step made evidence cheaper to collect. The bottleneck moved to <b>interpreting</b> it correctly.</div>
@@ -154,7 +111,7 @@ layout: default
 </div>
 
 <!--
-Do not dwell on history. Land the last line: the bottleneck is interpretation, and an LLM is very fast at producing interpretations, correct or not.
+Do not dwell on history, and keep it tool-agnostic. Land the last line: the bottleneck is interpretation, and an LLM is very fast at producing interpretations, correct or not.
 -->
 
 ---
@@ -163,34 +120,16 @@ layout: default
 
 <div class="kicker">Part 2 · Then vs now</div>
 
-# Same incident, two eras: ImagePullBackOff
+# Triage and troubleshooting: then vs now
 
 <div class="body">
 
-<div class="grid-2">
-<div class="card">
-
-#### 🕰️ Then
-
-1. `kubectl get pods`, spot the failing pod
-2. `kubectl describe pod`, scroll to *Events*
-3. Search the error, read a thread
-4. Ask the person who knows the registry
-5. Fix, redeploy, hope
-
-</div>
-<div class="card good">
-
-#### 🤖 Now
-
-1. Paste the *Events* block into a copilot
-2. Get a ranked list of causes in seconds
-3. Run **one read-only check** to disprove the top one
-4. Apply a minimal fix, **verify** independently
-5. Draft the incident update with the AI
-
-</div>
-</div>
+| Triage step | 🕰️ Then | 🤖 Now |
+| :--- | :--- | :--- |
+| **Collect signals** | Open dashboards, grep logs, check recent changes by hand | Same sources, but the AI reads and summarizes long output in seconds |
+| **Interpret** | Search the error, read a thread, ask the person who knows | Ranked list of plausible causes, each tied to a quoted line |
+| **Confirm the cause** | Try something and hope | One read-only check that confirms or **disproves** the top hypothesis |
+| **Communicate** | Write the update from memory, mid-incident | Draft impact, status and next step from verified facts |
 
 <div class="grid-2">
   <div class="tip"><b>Genuinely better:</b> reading long output, listing causes you missed, explaining unfamiliar errors, drafting updates.</div>
@@ -200,7 +139,7 @@ layout: default
 </div>
 
 <!--
-Both flows use the same evidence. What changed is speed, and the new failure mode: a fluent answer that is not grounded in the cluster.
+Both flows use the same evidence. What changed is speed, and the new failure mode: a fluent answer that is not grounded in your systems.
 -->
 
 ---
@@ -217,11 +156,11 @@ layout: default
 
 | Stage | You do | You ask the AI to |
 | :--- | :--- | :--- |
-| **1. Summarize** | Collect raw `get`, `describe`, `logs`, `events` | Restate what the output *shows*, quoting exact lines |
+| **1. Summarize** | Collect raw logs, metrics, events and status output | Restate what the output *shows*, quoting exact lines |
 | **2. Hypothesize** | Paste the **complete** evidence | List **every** plausible cause, ranked, with quoted lines |
 | **3. Next check** | Pick one hypothesis | Give **one read-only** command that confirms or *disproves* it |
 | **4. Verify** | Run it yourself, paste back | Revise; apply **one** fix at a time and re-check |
-| **5.&nbsp;Communicate** | `make verify`, then share **verified facts** only | Draft a 3-line update: impact, verified cause, fix |
+| **5.&nbsp;Communicate** | Confirm recovery with an independent check, then share **verified facts** only | Draft a 3-line update: impact, verified cause, fix |
 
 </div>
 
@@ -235,11 +174,11 @@ layout: default
 
 <div class="kicker">Part 3 · AI in practice</div>
 
-# The prompt pattern
+# Prompt engineering: from vague to checkable
 
 <div class="body">
 
-<div class="sub"><code>Context + Symptom + Raw kubectl output + Goal</code></div>
+<div class="sub"><code>Rules + Issue + Task</code>, and the agent gathers the evidence itself</div>
 
 <div class="grid-2">
 <div class="card bad">
@@ -247,10 +186,12 @@ layout: default
 #### <carbon-close-filled /> Vague
 
 ```text
-My pod is stuck, what do I do?
+My pod is failing. Fix it.
 ```
 
-No evidence, so you get a generic checklist or an invented answer.
+- No evidence, so the AI guesses between causes
+- "Fix it" asks for an action, not understanding
+- Nothing is quoted, so you cannot tell a finding from a confident guess
 
 </div>
 <div class="card good">
@@ -258,14 +199,15 @@ No evidence, so you get a generic checklist or an invented answer.
 #### <carbon-checkmark-filled /> Structured
 
 ```text
-Namespace X, Deployment Y.
-Expected: Running 1/1.
-Actual: <symptom>.
-Verbatim output below.
-1. List EVERY distinct cause, quote the line.
-2. Read-only command that disproves each?
-3. Minimal fix preserving security intent.
-<PASTE RAW OUTPUT>
+RULES
+- Only propose fixes, never apply them.
+- Quote the exact line for every claim.
+- Do NOT invent values from memory.
+ISSUE
+<the symptom, nothing more>
+TASK
+Understand it, then propose a minimal fix,
+or the next read-only check.
 ```
 
 </div>
@@ -276,7 +218,31 @@ Verbatim output below.
 </div>
 
 <!--
-Constraints in the prompt are what make the answer verifiable.
+Constraints in the prompt are what make the answer verifiable. The ai-assist prompts in the workshop follow exactly this shape.
+-->
+
+---
+layout: default
+---
+
+<div class="kicker">Part 3 · AI in practice</div>
+
+# Anatomy of an agent-ready prompt
+
+<div class="body">
+
+<div class="grid-3">
+  <div class="card"><span class="chip red">RULES</span><h4 class="pt-2">Fence the agent</h4><span class="small">Read-only only. Quote evidence or say "unknown". List <b>every</b> cause and what would disprove it. No secrets.</span></div>
+  <div class="card"><span class="chip">ISSUE</span><h4 class="pt-2">Symptom only</h4><span class="small">Restate what the alert says. No root cause, no suspected fix: the agent should find it, not confirm your guess.</span></div>
+  <div class="card good"><span class="chip green">TASK</span><h4 class="pt-2">Understand, then propose</h4><span class="small">Ask for a minimal fix, or, if not confident, further read-only checks instead of a guess.</span></div>
+</div>
+
+<div class="tip"><b>After each change:</b> re-collect the evidence and ask: did the symptom shift? Quote the line that proves it, then run the next read-only check.</div>
+
+</div>
+
+<!--
+This is the structure used by ai-assist: manual evidence commands, a terse bad prompt, one paste-ready prompt, a follow-up, a short why. No placeholders: the agent gathers evidence itself.
 -->
 
 ---
@@ -339,22 +305,35 @@ layout: default
 
 <div class="kicker">Part 3 · AI in practice</div>
 
-# Tooling: pick the simplest tier that works
+# CLI tools: let the agent run the commands
 
 <div class="body">
 
-| Tier | Tool | Good for | Watch out for |
-| :--- | :--- | :--- | :--- |
-| **1** | **Web chat** | Zero setup; paste raw output | Copy-paste effort; secrets leaking into prompts |
-| **2** | **Kubernetes MCP server** | AI client reads live cluster state through typed tools | Scope credentials; read-only mode limits the server, not your kubeconfig |
-| **3** | **CLI agents** (`opencode`, `kubectl-ai`) | Agent runs the investigation loop for you | Allow `get`/`describe`/`logs`; deny `delete`/`apply`/`patch`/`exec` |
+<div class="grid-2">
+<div>
 
-<div class="tip"><b>Rule of thumb:</b> explain → 1 · live read-only → 2 · agents: sandbox or non-prod only.</div>
+```text
+# 1. Start a CLI agent where kubectl works
+#    (opencode, kubectl-ai, ...)
+# 2. Paste the agent-ready prompt
+#    (RULES, ISSUE, TASK): no evidence needed
+# 3. Review and approve every command
+# 4. Verify the result yourself
+```
+
+</div>
+<div class="col">
+<div class="card grow"><h4><carbon-terminal /> What changes</h4><span class="small">You stop copy-pasting evidence. The agent runs <code>get</code>, <code>describe</code>, <code>logs</code> and <code>events</code>, reads the output and iterates.</span></div>
+<div class="card warn grow"><h4><carbon-locked /> Permissions are the guardrail</h4><span class="small">Allow <code>get</code> / <code>describe</code> / <code>logs</code>. Deny <code>delete</code> / <code>apply</code> / <code>patch</code> / <code>exec</code>. Scope the kubeconfig to a non-prod cluster.</span></div>
+</div>
+</div>
+
+<div class="tip"><b>Remember:</b> everything the agent reads is untrusted input. More autonomy means a larger blast radius, so keep a human on every command.</div>
 
 </div>
 
 <!--
-More autonomy means a larger blast radius. Move up a tier only when the lower one is the bottleneck. Web chat is the baseline for everyone today.
+Web chat is the baseline: you paste evidence. A CLI agent removes the copy-paste but needs the guardrails from the previous slide enforced as permissions, not just as prompt text.
 -->
 
 ---
@@ -363,38 +342,25 @@ layout: default
 
 <div class="kicker">Part 3 · AI in practice</div>
 
-# Kubernetes MCP server: read-only by default
+# MCP vs CLI: kubectl or the Kubernetes MCP server?
 
 <div class="body">
 
-<div class="grid-2">
-<div>
+| | `kubectl` via a CLI agent | Kubernetes MCP server |
+| :--- | :--- | :--- |
+| **Interface** | Free-form shell commands | Typed tools (`pods_list`, `pods_log`, `events_list`) |
+| **Guardrails** | Command allowlist in the agent | `read_only`, `disable_destructive`, denied resources, toolsets |
+| **Output** | Raw text, filtered with `grep` / `jq` | Structured results shaped for the model |
+| **Flexibility** | Anything your shell can do | Only the tools the server exposes |
+| **Setup** | `kubectl` and a kubeconfig | Install and register a server in the AI client |
+| **Main risk** | A shell can run anything your credentials allow | Server config is not RBAC: the kubeconfig still sets the ceiling |
 
-```toml
-# mcp-config.toml
-read_only = true
-disable_destructive = true
-kubeconfig = "kind/.kube/config"
-toolsets = ["core", "config"]
-
-# Block Secrets; keep ConfigMaps readable
-[[denied_resources]]
-group = ""
-version = "v1"
-kind = "Secret"
-```
-
-</div>
-<div class="col">
-<div class="card grow"><h4><carbon-plug /> What the model can call</h4><span class="small"><code>pods_list</code>, <code>pods_get</code>, <code>pods_log</code>, <code>events_list</code>, <code>resources_get</code>: enough for Levels 01–03.</span></div>
-<div class="card warn grow"><h4><carbon-locked /> Least privilege</h4><span class="small">Pin <code>KUBECONFIG</code> to the workshop cluster. Deny <code>v1/Secret</code>. Every tool call should still be reviewed by a human.</span></div>
-</div>
-</div>
+<div class="tip"><b>Either way:</b> scope the kubeconfig first (least privilege, deny <code>Secret</code>). The CLI allowlist or MCP read-only mode is a second fence, not the first.</div>
 
 </div>
 
 <!--
-Full setup in docs/pre-workshop-checklist.md. Note: do not deny v1/ConfigMap, Levels 02 and 04 need it.
+Rule of thumb: CLI for flexibility and zero setup, MCP when you want a narrow, typed, auditable surface. Full MCP config (read_only, disable_destructive, denied v1/Secret, keep v1/ConfigMap readable) is in docs/pre-workshop-checklist.md.
 -->
 
 ---
