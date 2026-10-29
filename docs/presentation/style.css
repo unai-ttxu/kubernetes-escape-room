@@ -291,3 +291,22 @@
 @media (prefers-reduced-motion: reduce) {
   .slidev-layout h1, .slidev-layout::after { animation: none; }
 }
+
+/* ── Progress bar ─────────────────────────────────────────────────────── */
+.progress-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgba(185, 131, 255, 0.15);
+  z-index: 10;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--er-accent-2), var(--er-accent));
+  box-shadow: 0 0 12px rgba(255, 138, 31, 0.7);
+  border-radius: 0 3px 3px 0;
+  transition: width 0.4s ease;
+}
