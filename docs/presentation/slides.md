@@ -51,7 +51,7 @@ layout: default
   </div>
   <div class="card">
     <h4><carbon-user-avatar /> Unai Arrien</h4>
-    <span class="chip violet">SRE at Nexthink</span>
+    <span class="chip">SRE at Nexthink</span>
     <p class="small pt-2">Works on the operation and improvement of <b>resilient distributed systems</b>.</p>
     <p class="small">Experience in <b>automation</b>, <b>observability</b> and <b>incident response</b>. Enjoys helping teams investigate, debug and solve complex real-world problems.</p>
   </div>
@@ -78,7 +78,7 @@ layout: default
 <div class="grid-4">
   <div class="card"><h4><carbon-calendar /> 2004</h4><span class="small">Swiss SaaS product company, born at <b>EPFL</b>. Today 1,300+ employees worldwide, with an engineering hub in <b>Madrid</b>.</span></div>
   <div class="card"><h4><carbon-user-multiple /> 1,500+ customers</h4><span class="small">Trusted by some of the world's largest organizations.</span></div>
-  <div class="card"><h4><carbon-devices /> 40M+ endpoints</h4><span class="small">Monitored worldwide by our platform.</span></div>
+  <div class="card"><h4><carbon-devices /> Millions of endpoints</h4><span class="small">Monitored worldwide by our platform.</span></div>
   <div class="card"><h4><carbon-code /> ~400 engineers</h4><span class="small">Java, microservices, React, TypeScript, Kubernetes, AWS, and AI.</span></div>
 </div>
 
@@ -90,7 +90,7 @@ layout: default
 </div>
 
 <!--
-Keep it to ~2 minutes. Nexthink: Swiss SaaS company founded in 2004 at EPFL, 1,300+ employees, engineering hub in Madrid. Mission: improve Digital Employee Experience via collectors on endpoints that proactively detect and resolve issues. 1,500+ customers, 40M+ endpoints, ~400 engineers across Java, microservices, React, TypeScript, Kubernetes, AWS, cloud and AI.
+Keep it to ~2 minutes. Nexthink: Swiss SaaS company founded in 2004 at EPFL, 1,300+ employees, engineering hub in Madrid. Mission: improve Digital Employee Experience via collectors on endpoints that proactively detect and resolve issues. 1,500+ customers, millions of endpoints, ~400 engineers across Java, microservices, React, TypeScript, Kubernetes, AWS, cloud and AI.
 Bridge: as engineers we have seen AI reshape how software is designed, developed, tested and operated. Invite questions; make it interactive.
 -->
 
@@ -195,7 +195,7 @@ layout: default
 
 <div class="grid-2">
   <div class="tip"><b>Where AI helps:</b> reading long output, listing causes you missed, explaining unfamiliar errors, drafting updates.</div>
-  <div class="tip" style="border-color: var(--er-bad); background: rgba(248,113,113,0.07)"><b>Still your job:</b> choosing the evidence, noticing when the AI stopped at the first error, rejecting invented facts, owning the impact of every change.</div>
+  <div class="tip" style="border-color: var(--er-bad); background: rgba(255,77,94,0.07)"><b>Still your job:</b> choosing the evidence, noticing when the AI stopped at the first error, rejecting invented facts, owning the impact of every change.</div>
 </div>
 
 </div>
@@ -617,7 +617,7 @@ layout: default
 
 <div class="grid-2">
   <div class="tip"><b>Where AI helped:</b> reading long output, listing causes, explaining unfamiliar errors.</div>
-  <div class="tip" style="border-color: var(--er-bad); background: rgba(248,113,113,0.07)"><b>Where humans mattered:</b> choosing the evidence, checking claims, and owning every change.</div>
+  <div class="tip" style="border-color: var(--er-bad); background: rgba(255,77,94,0.07)"><b>Where humans mattered:</b> choosing the evidence, checking claims, and owning every change.</div>
 </div>
 
 </div>
@@ -698,7 +698,7 @@ layout: end
 <div class="grid-2 text-left pt-6" style="align-items: center">
   <div class="col">
     <div class="kicker"><carbon-user-follow /> Nexthink · Madrid</div>
-    <div class="card good"><h4><carbon-cloud-services /> Join the SRE team</h4><span class="small">Kubernetes, AWS and AI-assisted operations at scale, on a platform monitoring 40M+ endpoints.</span></div>
+    <div class="card good"><h4><carbon-cloud-services /> Join the SRE team</h4><span class="small">Kubernetes, AWS and AI-assisted operations at scale, on a platform monitoring millions of endpoints.</span></div>
     <span class="small">Scan the QR to see the open position.</span>
   </div>
   <div class="flex justify-center">
