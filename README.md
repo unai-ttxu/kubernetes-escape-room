@@ -114,16 +114,15 @@ make test LEVEL=all     # run end-to-end smoke tests across all 4 levels (or LEV
 
 ---
 
-## AI plugin marketplace
+## AI plugin
 
-This repo is also a Claude Code plugin marketplace. The `k8s-troubleshooting` plugin bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`):
+`plugins/k8s-troubleshooting/` bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`). Load it locally, from a scratch directory outside the repo:
 
+```bash
+claude --plugin-dir "<repo-root>/plugins/k8s-troubleshooting"
 ```
-/plugin marketplace add unai-ttxu/kubernetes-escape-room
-/plugin install k8s-troubleshooting --marketplace unai-ttxu/kubernetes-escape-room
-```
 
-Installing copies the plugin out of the repo, so the agent still never sees hints or solutions. Requires `npx` for the MCP server.
+Copilot CLI and opencode steps are in [`docs/plugin-installation.md`](docs/plugin-installation.md). Requires `npx` for the MCP server.
 
 ---
 
@@ -135,8 +134,6 @@ kubernetes-escape-room/
 ├── README.md                        # Project overview & quickstart
 ├── Makefile                         # Task runner for slides, linting, validation & smoke tests
 ├── .mcp.json                        # Root Slidev MCP server config (CLI/IDE clients)
-├── .claude-plugin/
-│   └── marketplace.json             # Claude Code plugin marketplace catalog
 ├── plugins/
 │   └── k8s-troubleshooting/         # Plugin: troubleshooting skill + read-only MCP config
 │       ├── .claude-plugin/plugin.json
@@ -180,10 +177,12 @@ kubernetes-escape-room/
     │   ├── 06-level-04.md           # Session 6: Bonus Level 04 — The Ghost in the Microservices
     │   ├── 07-milestone-06.md       # Session 7: Workshop presentation, docs & pre-event readiness
     │   ├── 08-ai-assist-prompts.md  # Session 8: Agent-ready ai-assist prompts & optional glow rendering
-    │   └── 09-kubeconfig-paths-make-help.md  # Session 9: Absolute KUBECONFIG paths & grouped make help
+    │   ├── 09-kubeconfig-paths-make-help.md  # Session 9: Absolute KUBECONFIG paths & grouped make help
+    │   └── 10-k8s-plugin.md  # Session 10: k8s-troubleshooting plugin
     ├── ai-prompts-cheatsheet.md     # One-page A4 SRE Copilot cheatsheet (M5/M6)
     ├── ai-exercises.md              # Instructor guide: bad vs good prompts per level, challenge exercise (M5)
     ├── ai-research-notes.md         # Cited sources on AI-assisted troubleshooting (M5)
+    ├── plugin-installation.md       # Installing the k8s-troubleshooting plugin (Claude Code, Copilot CLI, opencode)
     └── pre-workshop-checklist.md    # Instructor & attendee pre-event checklist (M6)
 ```
 
