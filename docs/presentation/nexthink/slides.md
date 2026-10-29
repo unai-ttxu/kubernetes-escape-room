@@ -88,7 +88,7 @@ layout: default
 
 <div class="grid-2">
   <div class="card good"><h4><carbon-flag /> Our mission</h4><span class="small">Improve the <b>Digital Employee Experience (DEX)</b>: better technology for employees, more productivity for organizations.</span></div>
-  <div class="card"><h4><carbon-chip /> How it works</h4><span class="small">Collectors installed on endpoints run on the operating system, detecting and helping resolve issues before they impact users.</span></div>
+  <div class="card"><h4><carbon-chip /> How it works</h4><span class="small">Collectors are lightweight agents installed on devices that collect telemetry. This allows to detect, prevent and resolve issues before impacting users.</span></div>
 </div>
 
 </div>
