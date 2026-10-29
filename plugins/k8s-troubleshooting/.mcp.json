@@ -1,6 +1,7 @@
 {
   "mcpServers": {
-    "k8s-readonly": {
+    "kubernetes": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "-y",

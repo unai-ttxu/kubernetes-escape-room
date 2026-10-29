@@ -26,9 +26,11 @@
 ## 🧠 Learnings
 
 1. **No kubeconfig in the plugin.** The MCP server inherits the session's `KUBECONFIG`, so the plugin carries no absolute path (rule 6) and works for any cluster. `${CLAUDE_PLUGIN_ROOT}` locates the shipped toml.
-2. **Persistent install needs a marketplace.** `claude plugin install` only installs from a marketplace, and `--plugin-dir` is per session. A first iteration dropped the marketplace; it came back as a local-path marketplace so `make plugin-install` works.
-3. **Start the agent outside the repo.** The installed plugin is read live from the checkout, but the session's working directory must be a scratch directory, otherwise the agent reads `AGENTS.md`, `hints.md` and `solution/`.
-4. **Other CLIs diverge (TODO, out of scope here).** Copilot CLI reads `skills/` and legacy `.mcp.json`, but its docs describe `${PLUGIN_ROOT}` expansion only for the newer `mcp.json` format, so `${CLAUDE_PLUGIN_ROOT}` there is unverified. opencode needs the skill copied and an `mcp` entry with a `<repo-root>` placeholder.
+2. **Server options are TOML-only.** `kubernetes-mcp-server@0.0.69` rejects `--read-only` and `--cluster-provider` (`unknown flag`); `read_only = true` and `cluster_provider_strategy = "kubeconfig"` live in `config/mcp-config.toml`.
+3. **A gitignore pattern hid the plugin config.** The existing `mcp-config.toml` ignore rule also matched `plugins/k8s-troubleshooting/config/mcp-config.toml`, so the first commits shipped a plugin without it (the MCP server would not start). Fixed with a `!` exception; verify with `git ls-files plugins`.
+4. **Persistent install needs a marketplace.** `claude plugin install` only installs from a marketplace, and `--plugin-dir` is per session. A first iteration dropped the marketplace; it came back as a local-path marketplace so `make plugin-install` works.
+5. **Start the agent outside the repo.** The installed plugin is read live from the checkout, but the session's working directory must be a scratch directory, otherwise the agent reads `AGENTS.md`, `hints.md` and `solution/`.
+6. **Other CLIs diverge (TODO, out of scope here).** Copilot CLI reads `skills/` and legacy `.mcp.json`, but its docs describe `${PLUGIN_ROOT}` expansion only for the newer `mcp.json` format, so `${CLAUDE_PLUGIN_ROOT}` there is unverified. opencode needs the skill copied and an `mcp` entry with a `<repo-root>` placeholder.
 
 ## ✅ Verification
 
@@ -38,6 +40,6 @@
 
 ## Review checklist
 
-- [ ] After `make plugin-install` and a restart, `/mcp` shows `k8s-readonly` connected
+- [ ] After `make plugin-install` and a restart, `/mcp` shows `kubernetes` connected
 - [ ] Skill triggers on a failing-pod prompt against a running level
 - [ ] TODO tracked in `docs/plugin-installation.md`: Copilot CLI and opencode

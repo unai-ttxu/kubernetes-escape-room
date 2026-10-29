@@ -4,6 +4,7 @@ kubeconfig
 .DS_Store
 kind/.kube/
 mcp-config.toml
+!plugins/k8s-troubleshooting/config/mcp-config.toml
 opencode.json
 node_modules/
 docs/presentation/dist/

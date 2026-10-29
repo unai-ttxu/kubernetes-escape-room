@@ -18,7 +18,7 @@ mkdir -p ~/escape-room-agent && cd ~/escape-room-agent
 claude
 ```
 
-Check `/plugin` (plugin loaded) and `/mcp` (`k8s-readonly` connected). To load the plugin for one session without installing: `claude --plugin-dir "<repo-root>/plugins/k8s-troubleshooting"`. Validate the files with `claude plugin validate .` from the repository root.
+Check `/plugin` (plugin loaded) and `/mcp` (`kubernetes` connected). To load the plugin for one session without installing: `claude --plugin-dir "<repo-root>/plugins/k8s-troubleshooting"`. Validate the files with `claude plugin validate .` from the repository root.
 
 ## TODO: other CLI tools
 

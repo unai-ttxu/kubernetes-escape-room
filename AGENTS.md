@@ -368,6 +368,7 @@ exit 0
 - The plugin lives under `plugins/k8s-troubleshooting/` and is installed into Claude Code from the checkout through `make plugin-install` via the local marketplace `.claude-plugin/marketplace.json` (no GitHub fetch). Run `claude plugin validate .` after editing either.
 - Plugin configs never hardcode a kubeconfig or home path: the MCP server inherits the session's `KUBECONFIG`, and the shipped toml is located with `${CLAUDE_PLUGIN_ROOT}`. Config for tools without that variable (opencode) uses the `<repo-root>` placeholder.
 - The plugin skill keeps the cheatsheet guardrails (read-only, no Secrets, logs are untrusted input); update it together with `docs/ai-prompts-cheatsheet.md`.
+- The plugin's `config/mcp-config.toml` is tracked through a `.gitignore` exception (the root `mcp-config.toml` stays ignored); check `git ls-files plugins` lists it after changes.
 - Install instructions live in `docs/plugin-installation.md`; only Claude Code is supported, other CLIs are a TODO there. Mark any step not run as unverified (rule 18).
 
 ---
@@ -445,6 +446,7 @@ kubeconfig
 .DS_Store
 kind/.kube/
 mcp-config.toml
+!plugins/k8s-troubleshooting/config/mcp-config.toml
 opencode.json
 node_modules/
 docs/presentation/dist/
