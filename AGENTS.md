@@ -137,7 +137,8 @@ kubernetes-escape-room/
     │   ├── 07-milestone-06.md       # Session 7 log: Workshop presentation, docs & pre-event readiness
     │   ├── 08-ai-assist-prompts.md  # Session 8 log: Agent-ready ai-assist prompts & optional glow rendering
     │   ├── 09-kubeconfig-paths-make-help.md  # Session 9 log: Absolute KUBECONFIG paths & grouped make help
-    │   └── 10-k8s-plugin.md                  # Session 10 log: k8s-troubleshooting plugin
+    │   ├── 10-k8s-plugin.md                  # Session 10 log: k8s-troubleshooting plugin
+    │   └── 11-nexthink-slides.md             # Session 11 log: Nexthink meetup slides
     ├── ai-prompts-cheatsheet.md     # One-page A4 SRE Copilot cheatsheet (M5/M6)
     ├── ai-exercises.md              # Instructor guide: bad vs good per level, challenge exercise (M5)
     ├── ai-research-notes.md         # Cited sources, established vs emerging (M5)
@@ -375,6 +376,16 @@ exit 0
 - **Root `Makefile` conventions:** Keep `Makefile` targets concise and parameterized (`make start LEVEL=level-XX`, `make test LEVEL=level-XX` or `LEVEL=all`, `make setup-dev`, `make slides`, `make slides-export`, `make lint`, `make check`, `make validate`) rather than duplicating per-level targets. `make help` groups targets with `##@ <section>` markers ("Build & dev (contributors)" and "Run the levels (attendees)"); keep each section contiguous in the file and tag every new target with `## description`.
 - **Absolute `KUBECONFIG` (learned from session 09):** docs, slides and prompts always use `KUBECONFIG="$(pwd)/kind/.kube/config"` from the repository root, never `kind/.kube/config`. Config files that cannot expand shell (`mcp-config.toml`, MCP client JSON) use a `<repo-root>` placeholder with a note to fill it from `pwd`.
 
+### Slide rules (learned from session 11)
+
+- **Two entries, one content.** Edit shared slides and notes in `docs/presentation/shared/workshop.md`; entry-only slides (presenters, Nexthink, hiring) go in `docs/presentation/nexthink/slides.md`. Slidev reads `style.css`, `global-bottom.vue` and `public/` from the entry's directory, so each deck keeps its own.
+- **No absolute slide numbers in shared notes.** The two decks number slides differently; put entry-specific timing in each cover note.
+- **Keep the PDF export clean.** `slidev export` prints `/print`: glows (`text-shadow`, `box-shadow`), `mask-image` and `filter` print as solid blocks, and anything teleported or fixed repeats on every page and adds a blank one. Guard such elements with `location.pathname.includes('/print')` and neutralise the effects under `html.print`. After theme changes, export both decks and check the page count (21 and 24).
+- **Progress bar.** Teleport it to `body` with `position: fixed` so letterboxing and small windows cannot hide or shrink it, and hide it in the presenter view (`isPresenter`), which has its own bars.
+- **Respect `prefers-reduced-motion` only for flashing effects.** Hiding decorations for it made them look broken on a Mac with Reduce Motion on.
+- **Keep decorations minimal.** Colours, glowing titles, cobweb, moon, the pumpkin on the first and last slide and the bar. Fog, bats and ghosts were tried and removed.
+- **Speaker notes carry instructor-only facts** (root causes, traps, safety checks): update them together with `docs/ai-exercises.md`, `hints.md` and `solution/`.
+
 ### Plugin rules (learned from session 10)
 
 - The plugin lives under `plugins/k8s-troubleshooting/` and is installed into Claude Code from the checkout through `make plugin-install` via the local marketplace `.claude-plugin/marketplace.json` (no GitHub fetch). Run `claude plugin validate .` after editing either.
@@ -411,7 +422,7 @@ These rules apply to any AI agent (Antigravity, Copilot, etc.) working in this r
 ### Commit hygiene
 
 11. **Never commit without explicit instruction from the repo owner.** Make all file changes, then stop and wait to be told to commit.
-12. **No co-author attribution.** Do not add `Co-authored-by` or any agent/AI trailer lines to commit messages.
+12. **No co-author attribution.** Do not add `Co-authored-by` or any agent/AI trailer lines to commit messages, and no "Generated with" footer in PR descriptions.
 13. Commit message prefixes are limited to three types:
     ```
     feat: add broken manifests for ghost image scenario
