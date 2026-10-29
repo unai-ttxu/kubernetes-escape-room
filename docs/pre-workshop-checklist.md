@@ -47,7 +47,7 @@ Every scenario is designed to work with **zero AI tooling setup** using any free
 | :--- | :--- | :--- |
 | **Tier 1: Web Copilot (Default)** | **None** — open Gemini, ChatGPT, or Claude in a browser | Copy-paste raw `kubectl` output using the **SRE Copilot Prompt Pattern** in [`docs/ai-prompts-cheatsheet.md`](ai-prompts-cheatsheet.md) |
 | **Tier 2: `k8sgpt`** | Optional (`k8sgpt` binary + an AI backend configured with `k8sgpt auth`) | Runs built-in analyzers locally (`k8sgpt analyze`); `--explain` sends the structured finding to the AI backend, `--anonymize` masks sensitive fields. Use it as a first look, then confirm with `describe` / `logs` |
-| **Tier 3: Read-Only Kubernetes MCP Server** | Optional (`Node.js` / `npx` + MCP-capable client) | Calls read-only cluster tools (`pods_list`, `pods_get`, `pods_log`, `events_list`, `resources_get`) scoped to `kind/.kube/config` |
+| **Tier 3: Read-Only Kubernetes MCP Server** | Optional (`Node.js` / `npx` + MCP-capable client) | Calls read-only cluster tools (`pods_list`, `pods_get`, `pods_log`, `events_list`, `resources_get`) scoped to the repo-local `kind/.kube/config` (absolute path) |
 | **Tier 4: CLI Agent (`opencode`, `kubectl-ai`)** | Optional (CLI agent binary installed) | Runs `kubectl get`/`describe`/`logs` with a read-only permission policy (`opencode.json`) |
 
 ### Optional Tier 2 Setup: `k8sgpt`
@@ -70,7 +70,7 @@ If an attendee or instructor wants to use [`containers/kubernetes-mcp-server`](h
 # mcp-config.toml — strict read-only profile scoped to the workshop cluster
 read_only = true
 disable_destructive = true
-kubeconfig = "kind/.kube/config"
+kubeconfig = "<repo-root>/kind/.kube/config"  # absolute path: replace <repo-root> with the output of `pwd`
 toolsets = ["core", "config"]
 
 # Block Secret payloads; keep v1/ConfigMap readable for Levels 02 and 04
@@ -80,7 +80,7 @@ version = "v1"
 kind = "Secret"
 ```
 
-Register the server in your MCP client configuration:
+Both `kubeconfig` and `KUBECONFIG` must be absolute paths (MCP clients may start the server from another directory), so replace `<repo-root>` with the output of `pwd` run in the repository root. Register the server in your MCP client configuration:
 
 ```json
 {
@@ -88,7 +88,7 @@ Register the server in your MCP client configuration:
     "k8s-escape-room": {
       "command": "npx",
       "args": ["-y", "kubernetes-mcp-server@0.0.69", "--config", "mcp-config.toml"],
-      "env": { "KUBECONFIG": "kind/.kube/config" }
+      "env": { "KUBECONFIG": "<repo-root>/kind/.kube/config" }
     }
   }
 }
@@ -96,7 +96,7 @@ Register the server in your MCP client configuration:
 
 ### Optional Tier 4 Setup: CLI Agent (`opencode`)
 
-To restrict `opencode` to read-only cluster inspection (and prevent it from running `make solve`), save `opencode.json` in the repository root (gitignored) and launch with `KUBECONFIG=kind/.kube/config opencode`:
+To restrict `opencode` to read-only cluster inspection (and prevent it from running `make solve`), save `opencode.json` in the repository root (gitignored) and launch from the repository root with `KUBECONFIG="$(pwd)/kind/.kube/config" opencode`:
 
 ```json
 {
@@ -140,7 +140,7 @@ Run this deterministic smoke test from the repository root to verify the harness
   make cleanup
   make setup
   ```
-  *Expected:* Cluster `escape-room` is created, Cilium `1.20.2` and Hubble roll out, and `kubectl --kubeconfig kind/.kube/config get nodes` shows `Ready`.
+  *Expected:* Cluster `escape-room` is created, Cilium `1.20.2` and Hubble roll out, and `kubectl --kubeconfig "$(pwd)/kind/.kube/config" get nodes` shows `Ready`.
 - [ ] **3. Smoke-test all 4 levels (`level-01`, `level-02`, `level-03`, `level-04`):**
   ```bash
   make test LEVEL=all
