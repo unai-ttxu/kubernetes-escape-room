@@ -83,7 +83,7 @@ make cleanup                   # tear down the Kind cluster
 > **Kubeconfig:** `make setup` writes a repo-local kubeconfig to `kind/.kube/config` (gitignored, removed by `make cleanup`). Every `make` target and `verify.sh` uses it automatically, so your current `kubectl` context is never touched. To run your own `kubectl` commands against the escape-room cluster, point your shell at it from the repository root:
 >
 > ```bash
-> export KUBECONFIG="$PWD/kind/.kube/config"
+> export KUBECONFIG="$(pwd)/kind/.kube/config"
 > ```
 
 Run `make help` for the full target list, grouped into level-running and contributor targets. For instructors and contributors, `Makefile` also provides presentation and validation workflows:

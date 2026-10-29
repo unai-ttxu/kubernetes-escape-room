@@ -133,8 +133,10 @@ ai-assist: ## Show the spoiler-free AI copilot tip for the active level
 verify: ## Run the active level's in-cluster verification probe
 	$(HARNESS) verify
 
-solve: ## Apply the reference solution for the active level (instructor only)
-	$(HARNESS) solve
-
 reset: ## Re-inject the active level's broken state
 	$(HARNESS) reset
+
+##@ Instructor
+
+solve: ## Apply the reference solution for the active level (instructor only)
+	$(HARNESS) solve

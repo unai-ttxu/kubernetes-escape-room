@@ -35,7 +35,7 @@ make prepare
 make start LEVEL=level-01
 ```
 
-> **Note on `KUBECONFIG`:** `make setup` writes a repo-local kubeconfig at `kind/.kube/config` and also updates your active context to `kind-escape-room`. If you switch contexts in another terminal, run `export KUBECONFIG="$PWD/kind/.kube/config"` so your manual `kubectl` commands always target the workshop cluster.
+> **Note on `KUBECONFIG`:** `make setup` writes a repo-local kubeconfig at `kind/.kube/config` and also updates your active context to `kind-escape-room`. If you switch contexts in another terminal, run `export KUBECONFIG="$(pwd)/kind/.kube/config"` so your manual `kubectl` commands always target the workshop cluster.
 
 ---
 
@@ -55,7 +55,7 @@ Every scenario is designed to work with **zero AI tooling setup** using any free
 Install `k8sgpt` from the [k8sgpt docs](https://k8sgpt.ai/docs/getting-started/overview), configure a backend with `k8sgpt auth` (a local model avoids sending cluster data off-machine), and point it at the workshop cluster:
 
 ```bash
-export KUBECONFIG="$PWD/kind/.kube/config"
+export KUBECONFIG="$(pwd)/kind/.kube/config"
 k8sgpt analyze --namespace escape-level-01 --explain --anonymize
 k8sgpt analyze --filter=NetworkPolicy --namespace escape-level-03
 ```
@@ -80,14 +80,14 @@ version = "v1"
 kind = "Secret"
 ```
 
-Both `kubeconfig` and `KUBECONFIG` must be absolute paths (MCP clients may start the server from another directory), so replace `<repo-root>` with the output of `pwd` run in the repository root. Register the server in your MCP client configuration:
+`kubeconfig`, `KUBECONFIG` and `--config` must be absolute paths (MCP clients may start the server from another directory), so replace `<repo-root>` with the output of `pwd` run in the repository root. Register the server in your MCP client configuration:
 
 ```json
 {
   "mcpServers": {
     "k8s-escape-room": {
       "command": "npx",
-      "args": ["-y", "kubernetes-mcp-server@0.0.69", "--config", "mcp-config.toml"],
+      "args": ["-y", "kubernetes-mcp-server@0.0.69", "--config", "<repo-root>/mcp-config.toml"],
       "env": { "KUBECONFIG": "<repo-root>/kind/.kube/config" }
     }
   }
@@ -153,7 +153,7 @@ Run this deterministic smoke test from the repository root to verify the harness
 
 ### B. 30 Minutes Before the Workshop (Room Readiness)
 
-- [ ] Start Docker Desktop on the instructor laptop and verify `export KUBECONFIG="$PWD/kind/.kube/config"`.
+- [ ] Start Docker Desktop on the instructor laptop and verify `export KUBECONFIG="$(pwd)/kind/.kube/config"`.
 - [ ] Reset the instructor cluster to Level 01 so the live terminal demo is ready:
   ```bash
   make start LEVEL=level-01
