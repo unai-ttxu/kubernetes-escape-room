@@ -39,7 +39,7 @@ layout: default
 
 <div class="kicker">Who are we?</div>
 
-# Your presenters
+# The speakers
 
 <div class="body">
 
@@ -47,8 +47,16 @@ layout: default
   <div class="card">
     <h4><carbon-user-avatar /> Carlos Vicent</h4>
     <span class="chip">SRE at Nexthink</span>
-    <p class="small pt-2">Leads reliability initiatives for <b>20M+ endpoints</b> across a distributed platform of <b>200+ microservices</b>.</p>
-    <p class="small">Specialises in <b>incident response automation</b> and <b>observability</b> for cloud-native environments. Big Kubernetes enthusiast and regular at DevOps, SRE and observability conferences worldwide.</p>
+   <p class="small pt-2">
+    Works on reliability for the platform behind <b>20M+ endpoints</b>, running <b>200+ microservices</b>.
+  </p>
+  <p class="small">
+    Focuses on <b>incident response automation</b> and <b>observability</b> in cloud-native environments. Enjoys Kubernetes and often attends DevOps, SRE and observability conferences.
+  </p>
+  <p class="small">
+    Off duty, he's a <b>runner</b>. He's one of the few people who treats a 10K as a normal way to
+    decompress, and who has never been paged mid-run (yet).
+  </p>
   </div>
   <div class="card">
     <h4><carbon-user-avatar /> Unai Arrien</h4>
@@ -58,7 +66,7 @@ layout: default
   </div>
 </div>
 
-<div class="tip"><b>Tonight, together:</b> we guide the hands-on part. You investigate incidents, follow the clues and see what happens when AI becomes part of the debugging process.</div>
+<div class="tip"><b>Tonight, together:</b> we will guide the hands-on part. You investigate incidents, follow the clues and see what happens when AI becomes part of the debugging process.</div>
 
 </div>
 
@@ -113,7 +121,7 @@ layout: end
 <div class="grid-2 text-left pt-6" style="align-items: center">
   <div class="col">
     <div class="kicker"><carbon-user-follow /> Nexthink · Madrid</div>
-    <div class="card good"><h4><carbon-cloud-services /> Join the SRE team</h4><span class="small">Kubernetes, AWS and AI-assisted operations at scale, on a platform monitoring millions of endpoints.</span></div>
+    <div class="card good"><h4><carbon-cloud-services /> Join the SRE team @ Nexthink</h4><span class="small">Kubernetes, AWS and AI-assisted operations at scale, on a platform monitoring millions of endpoints.</span></div>
     <span class="small">Scan the QR to see the open position.</span>
   </div>
   <div class="flex justify-center">

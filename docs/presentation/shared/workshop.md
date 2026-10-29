@@ -363,10 +363,10 @@ layout: default
 <div class="card"><h4><carbon-security /> Ground rules &amp; help ladder</h4>
 <ul class="small">
   <li>One namespace per level (<code>escape-level-01</code> … <code>03</code>)</li>
-  <li>For your own <code>kubectl</code>: <code>export KUBECONFIG="$(pwd)/kind/.kube/config"</code> to target only the room</li>
-  <li><code>verify</code> probes the service from inside the cluster</li>
-  <li>Using a CLI agent? Start it from a directory <b>outside this repo</b>, so it can't read hints or solutions</li>
-  <li><b>Help ladder:</b> <code>hint</code> (concept, then commands, then a nudge to <code>ai-assist</code>), then <code>ai-assist</code> (free, spoiler-free prompt)</li>
+  <li>For your own <code>kubectl</code>: <code>export KUBECONFIG="$(pwd)/kind/.kube/config"</code> to target only the escape room</li>
+  <li><code>make verify</code> probes the challenge has been fixed from the cluster</li>
+  <li>Using CLI agents? Start it from a directory <b>outside this repo</b>, so it can't read hints or solutions</li>
+  <li><b>Help ladder:</b> <code>make hint</code> (3 hints), then <code>make ai-assist</code> (spoiler-free prompt)</li>
 </ul></div>
 
 ```bash
@@ -561,7 +561,7 @@ layout: default
 
 <div class="grid-3">
   <div class="card"><span class="chip">Level 01</span><h4 class="pt-2">Reading the evidence</h4><span class="small">With the verbatim <i>Events</i> plus a "do not invent" rule, the AI named the real failure. Without them it gave a generic checklist or an invented tag.</span></div>
-  <div class="card"><span class="chip">Level 02</span><h4 class="pt-2">Combining sources</h4><span class="small">Logs, <code>describe</code> and the config together exposed both causes. Logs alone stopped at the first error.</span></div>
+  <div class="card"><span class="chip">Level 02</span><h4 class="pt-2">Combining sources</h4><span class="small">Logs, <code>kubectl describe</code> and the config together exposed both causes. Logs alone stopped at the first error.</span></div>
   <div class="card"><span class="chip">Level 03</span><h4 class="pt-2">Cross-resource faults</h4><span class="small">The AI spotted the mismatches between resources. It needed a human to choose the verification order and reject unsafe shortcuts.</span></div>
 </div>
 
@@ -615,8 +615,8 @@ layout: default
 
 <div class="grid-3">
   <div class="card"><h4><carbon-user-activity /> Troubleshooting is a muscle</h4><span class="small">Reading events, logs and manifests by hand is a skill. Skills you stop using fade.</span></div>
-  <div class="card warn"><h4><carbon-view /> Hindsight makes it look easy</h4><span class="small">Once the root cause is known, the path to it looks obvious. It never is while the pager is going off.</span></div>
-  <div class="card good"><h4><carbon-user-follow /> Train on purpose</h4><span class="small">Practise incidents and game days with no AI, so you can still debug when the tool is wrong, down or not allowed.</span></div>
+  <div class="card warn"><h4><carbon-view /> Hindsight makes it look easy</h4><span class="small">Once the root cause is known, the path to it looks obvious. It's not easy while the incident is going on.</span></div>
+  <div class="card good"><h4><carbon-user-follow /> Train on purpose</h4><span class="small">Practise incidents and game days without AI, so you can still debug when the tool is wrong, down or not allowed.</span></div>
 </div>
 
 <div class="tip"><b>Like the gym:</b> AI is the equipment that helps you lift more, but you only stay strong by doing the reps yourself. Use it to go faster, not to stop knowing how.</div>
