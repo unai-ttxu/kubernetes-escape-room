@@ -19,7 +19,7 @@ help: ## Show this help menu
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@awk 'BEGIN {FS = ":.*##"} \
 		/^##@/ {sub(/^##@ */, ""); if ($$0 != sec) {sec = $$0; printf "\n\033[1m%s\033[0m\n", sec}} \
-		/^[a-zA-Z0-9_-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+		/^[a-zA-Z0-9_-]+:.*##/ {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
 # ─── Contributor & Presentation Setup ─────────────────────────────────────────
@@ -50,15 +50,17 @@ slides: ## Start the live-reloading Slidev presentation server (http://localhost
 
 slides-export: ## Build and export presentation slides to PDF
 	@test -d $(SLIDES_DIR)/node_modules/playwright-chromium || $(MAKE) setup-dev
+	@npx --prefix $(SLIDES_DIR) playwright install chromium >/dev/null
 	npm --prefix $(SLIDES_DIR) run build
 	npm --prefix $(SLIDES_DIR) run export
 
-slides-nexthink: ## Start the Nexthink meetup variant of the slides (Halloween theme, extra intro and hiring slides)
+slides-nexthink: ## Start the Nexthink meetup variant of the slides (http://localhost:3030)
 	@test -d $(SLIDES_DIR)/node_modules || $(MAKE) setup-dev
 	npm --prefix $(SLIDES_DIR) run dev:nexthink
 
 slides-nexthink-export: ## Build and export the Nexthink meetup slides to PDF
 	@test -d $(SLIDES_DIR)/node_modules/playwright-chromium || $(MAKE) setup-dev
+	@npx --prefix $(SLIDES_DIR) playwright install chromium >/dev/null
 	npm --prefix $(SLIDES_DIR) run build:nexthink
 	npm --prefix $(SLIDES_DIR) run export:nexthink
 

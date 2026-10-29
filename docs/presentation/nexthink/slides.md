@@ -28,7 +28,7 @@ AI as a copilot, not an autopilot.
 </div>
 
 <!--
-⏱ ~0:30 · Total session ~55 min: intro 1-3 (~3 min), talk 4-14 (~10 min), room briefing 15 (~1 min), hands-on 16-18 (35-45 min), close 19, AI debrief 20 (~5 min), follow-up 21-22, questions 23, hiring 24.
+⏱ ~0:30 · Total session ~55 min: intro (you, Nexthink, route) ~3 min, talk ~10 min, room briefing ~1 min, hands-on 35-45 min across the three levels, AI debrief ~5 min, follow-up and keep training ~2 min, questions, hiring.
 Before starting: confirm everyone ran `make prepare` (cluster up, images pulled) and can run `make status`. Fallbacks for slow networks or missing tools: docs/pre-workshop-checklist.md.
 Open with the promise: AI is a copilot, not an autopilot. The cluster is the judge.
 -->

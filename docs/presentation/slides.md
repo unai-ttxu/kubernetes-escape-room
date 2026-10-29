@@ -29,7 +29,7 @@ AI as a copilot, not an autopilot.
 
 <!--
 Welcome attendees! Confirm everyone has cloned the repo and run `make setup`.
-Timing: talk (slides 2-12) ~10 min, hands-on (13-16) ~40 min, close (17), AI debrief (18) ~5 min, follow-up resources (19), keep training (20), questions (21).
+Timing: talk ~10 min, room briefing and the three levels ~40 min, close, AI debrief ~5 min, follow-up resources, keep training, questions.
 -->
 
 ---
