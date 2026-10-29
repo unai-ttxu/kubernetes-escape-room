@@ -298,6 +298,9 @@
   transition: width 0.4s ease;
 }
 
-@media print {
-  .progress-track { display: none; }
-}
+/* PDF export: Chromium rasterizes glows, masks and filters as solid blocks, so drop them */
+html.print .slidev-layout h1,
+html.print .kicker { text-shadow: none; }
+html.print .card { box-shadow: none; }
+html.print .slidev-layout::before { display: none; }
+html.print .slidev-layout.end::after { filter: none; animation: none; }
