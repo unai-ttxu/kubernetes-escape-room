@@ -49,14 +49,14 @@ layout: default
     <span class="chip">SRE at Nexthink</span>
     <p class="small">Works on reliability for the platform behind <b>20M+ endpoints</b>, running <b>200+ microservices</b>.</p>
     <p class="small">Focuses on <b>incident response automation</b> and <b>observability</b> in cloud-native environments. Enjoys Kubernetes and often attends DevOps, SRE and observability conferences.</p>
-    <p class="small">Off duty, he's a <b>runner</b>. He's one of the few people who treats a 10K as a normal way to decompress, and who has never been paged mid-run (yet).</p>
+    <p class="small"><span style="display:inline-block;transform:scaleX(-1)">🏃</span> Off duty, he's a <b>runner</b>. He's one of the few people who treats a 10K as a normal way to decompress, and who has never been paged mid-run (yet).</p>
   </div>
   <div class="card bio">
     <h4><carbon-user-avatar /> Unai Arrien</h4>
     <span class="chip">SRE at Nexthink</span>
     <p class="small">Works on the operation and improvement of <b>resilient distributed systems</b>.</p>
     <p class="small">Experience in <b>automation</b>, <b>observability</b> and <b>incident response</b>. Enjoys helping teams investigate, debug and solve complex real-world problems.</p>
-    <p class="small">Fuelled by <b>matcha</b>, served plain: no milk, no sugar, no fuss. Reads ingredient labels as carefully as changelogs.</p>
+    <p class="small">🍵 Fuelled by <b>matcha</b>, served plain: no milk, no sugar, no fuss. Reads ingredient labels as carefully as changelogs.</p>
   </div>
 </div>
 
