@@ -116,9 +116,16 @@ kubernetes-escape-room/
     ├── presentation/
     │   ├── README.md                # Contributor guide for Slidev & MCP setup
     │   ├── package.json             # Slidev dependencies & scripts
-    │   ├── slides.md                # Workshop presentation deck (M6)
+    │   ├── slides.md                # Workshop presentation deck (M6): cover + shared content
     │   ├── style.css                # Deck theme (colors, cards, chips)
-    │   └── global-bottom.vue        # Slide numbers (<n>/<total>)
+    │   ├── global-bottom.vue        # Slide numbers (<n>/<total>)
+    │   ├── shared/
+    │   │   └── workshop.md          # Slides and speaker notes shared by both decks
+    │   └── nexthink/                # Nexthink meetup variant (own entry, theme and assets)
+    │       ├── slides.md            # Presenters + Nexthink intro, shared slides, hiring slide
+    │       ├── style.css            # Halloween theme (also used by the PDF export)
+    │       ├── global-bottom.vue    # Progress bar + slide numbers
+    │       └── public/              # Hiring QR code
     ├── sessions/
     │   ├── 00-milestones.md         # Milestone tracker & review gates
     │   ├── 01-milestone-01.md       # Session 1 log: Core harness & cluster setup
@@ -208,6 +215,10 @@ make slides
 
 # Build and export the presentation to PDF (docs/presentation/slides-export.pdf)
 make slides-export
+
+# Nexthink meetup variant: same shared content with its own theme and extra slides
+make slides-nexthink
+make slides-nexthink-export   # docs/presentation/slides-nexthink-export.pdf
 ```
 
 ### Linting & shell script validation
@@ -357,6 +368,7 @@ exit 0
 
 ### Presentation & `Makefile` rules (learned from M6)
 
+- **Two decks, one content (`docs/presentation/`):** `slides.md` is the original workshop deck and `nexthink/slides.md` is the Nexthink meetup variant. Both import `shared/workshop.md` through `src:`, so edit shared slides and speaker notes there (keep notes free of absolute slide numbers). Each entry directory has its own `style.css`, `global-bottom.vue` and `public/` because Slidev uses the entry's directory as its root. Entry-specific slides (presenters, Nexthink, hiring) live only in the Nexthink entry.
 - **Subdirectory isolation (`docs/presentation/`):** Keep Slidev's `package.json` and `slides.md` (the generated `package-lock.json` is gitignored) inside `docs/presentation/` so the repository root remains free of Node.js runtime dependencies for attendees running `./scripts/escape-room.sh`.
 - **`npx` MCP binary resolution (`--prefix docs/presentation`):** On npm, the Slidev CLI package is `@slidev/cli` (which installs the local `slidev` binary into `docs/presentation/node_modules/.bin/slidev`); there is no standalone `slidev` package on the npm registry. Consequently, any MCP configuration or command executed from the repository root **must** pass `--prefix docs/presentation` (`npx --prefix docs/presentation slidev mcp docs/presentation/slides.md`).
 - **Slidev PDF export prerequisites (`playwright-chromium`):** `slidev export` requires both `"playwright-chromium"` in `docs/presentation/package.json` and the Chromium browser binary installed via `npx --prefix docs/presentation playwright install chromium`. `make setup-dev` installs both (and restores the pinned agent skills from `skills-lock.json`); `make slides-export` runs `setup-dev` if the dependencies are missing and builds the deck (`slidev build`) before exporting.
@@ -451,6 +463,8 @@ node_modules/
 docs/presentation/dist/
 docs/presentation/.slidev/
 docs/presentation/slides-export.pdf
+docs/presentation/slides-nexthink-export.pdf
+docs/presentation/nexthink/dist/
 docs/presentation/package-lock.json
 .agents/skills/
 ```
