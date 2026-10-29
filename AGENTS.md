@@ -57,6 +57,14 @@ kubernetes-escape-room/
 ├── README.md
 ├── Makefile                         # Task runner for slides, linting, validation & smoke tests
 ├── .mcp.json                        # Root Slidev MCP server config (CLI/IDE clients)
+├── .claude-plugin/
+│   └── marketplace.json             # Claude Code plugin marketplace catalog
+├── plugins/
+│   └── k8s-troubleshooting/         # Plugin: troubleshooting skill + read-only MCP config
+│       ├── .claude-plugin/plugin.json
+│       ├── .mcp.json
+│       ├── config/mcp-config.toml
+│       └── skills/k8s-troubleshooting/SKILL.md
 ├── skills-lock.json                 # Agent skills lockfile
 ├── .agents/
 │   ├── skills/

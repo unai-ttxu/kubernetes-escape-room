@@ -114,6 +114,19 @@ make test LEVEL=all     # run end-to-end smoke tests across all 4 levels (or LEV
 
 ---
 
+## AI plugin marketplace
+
+This repo is also a Claude Code plugin marketplace. The `k8s-troubleshooting` plugin bundles a read-only troubleshooting skill and a guarded `kubernetes-mcp-server` config (read-only, Secrets denied; it uses your session's `KUBECONFIG`):
+
+```
+/plugin marketplace add unai-ttxu/kubernetes-escape-room
+/plugin install k8s-troubleshooting --marketplace unai-ttxu/kubernetes-escape-room
+```
+
+Installing copies the plugin out of the repo, so the agent still never sees hints or solutions. Requires `npx` for the MCP server.
+
+---
+
 ## Repository structure
 
 ```
@@ -122,6 +135,14 @@ kubernetes-escape-room/
 ├── README.md                        # Project overview & quickstart
 ├── Makefile                         # Task runner for slides, linting, validation & smoke tests
 ├── .mcp.json                        # Root Slidev MCP server config (CLI/IDE clients)
+├── .claude-plugin/
+│   └── marketplace.json             # Claude Code plugin marketplace catalog
+├── plugins/
+│   └── k8s-troubleshooting/         # Plugin: troubleshooting skill + read-only MCP config
+│       ├── .claude-plugin/plugin.json
+│       ├── .mcp.json
+│       ├── config/mcp-config.toml
+│       └── skills/k8s-troubleshooting/SKILL.md
 ├── skills-lock.json                 # Agent skills lockfile
 ├── .agents/
 │   ├── skills/
