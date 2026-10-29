@@ -159,7 +159,7 @@ layout: default
 
 # From manual to AI-assisted incident management
 
-<div class="body">
+<div class="body lift">
 
 <div class="grid-4">
   <div class="card"><span class="chip">Then</span><h4 class="pt-2">Pager & tribal knowledge</h4><span class="small">An alert pages the one person who knows the system. Runbooks sit in a wiki; the rest is in people's heads.</span></div>
@@ -238,7 +238,7 @@ layout: default
 
 # Prompt engineering: from vague to checkable
 
-<div class="body">
+<div class="body lift">
 
 <div class="sub"><code>Rules + Issue + Task</code>, and the agent gathers the evidence itself</div>
 
@@ -387,7 +387,7 @@ layout: default
 
 # Share your setup: skills, MCP servers, context
 
-<div class="body">
+<div class="body lift">
 
 <div class="grid-3">
   <div class="card"><h4><carbon-document /> <code>AGENTS.md</code></h4><span class="small">Rules, commands and conventions for agents working in the repo. Most coding agents read it.</span></div>
@@ -576,6 +576,7 @@ Start the 15-20 minute timer.
 
 ---
 layout: end
+class: no-pumpkin
 ---
 
 # You escaped the room!
@@ -675,6 +676,7 @@ Land the point before Q&A: AI is a copilot, not a replacement for the skill. Onc
 
 ---
 layout: end
+class: no-pumpkin
 ---
 
 # Questions?
