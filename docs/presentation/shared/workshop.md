@@ -14,7 +14,7 @@ layout: default
 </div>
 
 <div class="grid-3">
-  <div class="card"><h4><carbon-idea /> You will leave with</h4><span class="small">A repeatable way to use AI in an incident: evidence first, conclusions second.</span></div>
+  <div class="card"><h4><carbon-idea /> You will leave with</h4><span class="small">A  way to use AI in an incident: evidence first, conclusions second.</span></div>
   <div class="card"><h4><carbon-tools /> You will see</h4><span class="small">Chat, MCP servers, CLI agents, and shared skills.</span></div>
   <div class="card"><h4><carbon-play-filled /> You will practice</h4><span class="small">Three broken scenarios. The AI will help, and sometimes mislead you.</span></div>
 </div>
@@ -71,13 +71,13 @@ layout: default
 <div class="body lift">
 
 <div class="grid-4">
-  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Pager & tribal knowledge</h4><span class="small">An alert pages the one person who knows the system. Runbooks sit in a wiki; the rest is in people's heads.</span></div>
-  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Dashboards & war rooms</h4><span class="small">Metrics, centralized logs, tracing. More signal, but you correlate it across tabs by hand.</span></div>
-  <div class="card good"><span class="chip green">Now</span><h4 class="pt-2">AI copilots</h4><span class="small">Paste in the evidence and get a summary and ranked hypotheses back. Also drafts updates and postmortems.</span></div>
+  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Pager & tribal knowledge</h4><span class="small">A page alerts the person who knows the system. Runbooks sit in a wiki; the rest is in people's heads.</span></div>
+  <div class="card"><span class="chip">Then</span><h4 class="pt-2">Dashboards & war rooms</h4><span class="small">Metrics, centralized logs, tracing. More signals, but correlations across tabs is done by hand.</span></div>
+  <div class="card good"><span class="chip green">Now</span><h4 class="pt-2">AI copilots</h4><span class="small">Paste the evidence and get a summary plus ranked hypotheses. In addition coplilots can draft updates and postmortems.</span></div>
   <div class="card good"><span class="chip violet">Emerging</span><h4 class="pt-2">AI agents</h4><span class="small">Agents call your tools, run checks and pull signals together. Add self-healing and they can even fix known issues on their own. A human should approve every action.</span></div>
 </div>
 
-<div class="quote">Each step made evidence cheaper to collect. The hard part is now <b>making the right decision</b>.</div>
+<div class="quote">Each step made evidences cheaper to collect. The hard part is to <b>make the right decision</b>.</div>
 
 </div>
 

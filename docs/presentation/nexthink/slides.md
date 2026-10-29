@@ -80,14 +80,14 @@ layout: default
 <div class="body">
 
 <div class="grid-4">
-  <div class="card"><h4><carbon-calendar /> 2004</h4><span class="small">Swiss SaaS product company, born at <b>EPFL</b>. Today 1,300+ employees worldwide, with an engineering hub in <b>Madrid</b>.</span></div>
-  <div class="card"><h4><carbon-user-multiple /> 1,500+ customers</h4><span class="small">Trusted by some of the world's largest organizations.</span></div>
-  <div class="card"><h4><carbon-devices /> Millions of endpoints</h4><span class="small">Monitored worldwide by our platform.</span></div>
-  <div class="card"><h4><carbon-code /> ~400 engineers</h4><span class="small">Java, microservices, React, TypeScript, Kubernetes, AWS, and AI.</span></div>
+  <div class="card"><h4><carbon-calendar /> 2004</h4><span class="small">Swiss SaaS product company, born at <b>EPFL</b>. Today +1,300 employees worldwide, with an engineering hub in <b>Madrid</b>.</span></div>
+  <div class="card"><h4><carbon-user-multiple /> +2k customers</h4><span class="small">Trusted by some of the world's largest organizations.</span></div>
+  <div class="card"><h4><carbon-devices /> +20M endpoints</h4><span class="small">Monitored worldwide by our platform.</span></div>
+  <div class="card"><h4><carbon-code /> +400 engineers</h4><span class="small">Microservices, React, TypeScript, Kafka, Kubernetes, AWS, Clickhouse, Datadog and AI.</span></div>
 </div>
 
 <div class="grid-2">
-  <div class="card good"><h4><carbon-flag /> Our mission</h4><span class="small">Improve the <b>Digital Employee Experience (DEX)</b>: better technology for employees, more productivity for organizations.</span></div>
+  <div class="card good"><h4><carbon-flag /> Our mission: To delight people at work</h4><span class="small">We are a software company focused on helping IT to shape smart and productive workplaces.</span></div>
   <div class="card"><h4><carbon-chip /> How it works</h4><span class="small">Collectors are lightweight agents installed on devices that collect telemetry. This allows to detect, prevent and resolve issues before impacting users.</span></div>
 </div>
 
