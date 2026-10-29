@@ -29,7 +29,36 @@ AI as a copilot, not an autopilot.
 
 <!--
 Welcome attendees! Confirm everyone has cloned the repo and run `make setup`.
-Timing: talk (slides 2-12) ~10 min, hands-on (13-16) ~40 min, close (17), AI debrief (18) ~5 min, follow-up resources (19), questions (20).
+Timing: talk (slides 2-13, incl. Nexthink intro) ~10 min, hands-on (14-17) ~40 min, close (18), AI debrief (19) ~5 min, follow-up resources (20), keep training (21), questions (22), hiring (23).
+-->
+
+---
+layout: default
+---
+
+<div class="kicker">Who are we?</div>
+
+# Nexthink in a nutshell
+
+<div class="body">
+
+<div class="grid-4">
+  <div class="card"><h4><carbon-calendar /> 2004</h4><span class="small">Swiss SaaS product company, born at <b>EPFL</b>. Today 1,300+ employees worldwide, with an engineering hub in <b>Madrid</b>.</span></div>
+  <div class="card"><h4><carbon-user-multiple /> 1,500+ customers</h4><span class="small">Trusted by some of the world's largest organizations.</span></div>
+  <div class="card"><h4><carbon-devices /> 40M+ endpoints</h4><span class="small">Monitored worldwide by our platform.</span></div>
+  <div class="card"><h4><carbon-code /> ~400 engineers</h4><span class="small">Java, microservices, React, TypeScript, Kubernetes, AWS, and AI.</span></div>
+</div>
+
+<div class="grid-2">
+  <div class="card good"><h4><carbon-flag /> Our mission</h4><span class="small">Improve the <b>Digital Employee Experience (DEX)</b>: better technology for employees, more productivity for organizations.</span></div>
+  <div class="card"><h4><carbon-chip /> How it works</h4><span class="small">Collectors installed on endpoints run on the operating system, detecting and helping resolve issues before they impact users.</span></div>
+</div>
+
+</div>
+
+<!--
+Keep it to ~2 minutes. Nexthink: Swiss SaaS company founded in 2004 at EPFL, 1,300+ employees, engineering hub in Madrid. Mission: improve Digital Employee Experience via collectors on endpoints that proactively detect and resolve issues. 1,500+ customers, 40M+ endpoints, ~400 engineers across Java, microservices, React, TypeScript, Kubernetes, AWS, cloud and AI.
+Bridge: as engineers we have seen AI reshape how software is designed, developed, tested and operated. Invite questions; make it interactive.
 -->
 
 ---
@@ -625,4 +654,25 @@ layout: end
 
 <!--
 Open the floor. Remind people to run `make cleanup` and to leave feedback.
+-->
+
+---
+layout: end
+---
+
+# We're hiring!
+
+<div class="grid-2 text-left pt-6" style="align-items: center">
+  <div class="col">
+    <div class="kicker"><carbon-user-follow /> Nexthink · Madrid</div>
+    <div class="card good"><h4><carbon-cloud-services /> Join the SRE team</h4><span class="small">Kubernetes, AWS and AI-assisted operations at scale, on a platform monitoring 40M+ endpoints.</span></div>
+    <span class="small">Scan the QR to see the open position.</span>
+  </div>
+  <div class="flex justify-center">
+    <img src="/sre-hiring-qr.png" alt="QR code to the open SRE position" style="width: 250px; background: #fff; padding: 12px; border-radius: 12px" />
+  </div>
+</div>
+
+<!--
+Closing plug: we are hiring for the SRE team. Point to the QR for the open position and invite people to talk to us after the session.
 -->
