@@ -130,7 +130,7 @@ kubernetes-escape-room/
     │   ├── 07-milestone-06.md       # Session 7 log: Workshop presentation, docs & pre-event readiness
     │   ├── 08-ai-assist-prompts.md  # Session 8 log: Agent-ready ai-assist prompts & optional glow rendering
     │   ├── 09-kubeconfig-paths-make-help.md  # Session 9 log: Absolute KUBECONFIG paths & grouped make help
-    │   └── 10-k8s-plugin.md  # Session 10 log: k8s-troubleshooting plugin
+    │   └── 10-k8s-plugin.md                  # Session 10 log: k8s-troubleshooting plugin
     ├── ai-prompts-cheatsheet.md     # One-page A4 SRE Copilot cheatsheet (M5/M6)
     ├── ai-exercises.md              # Instructor guide: bad vs good per level, challenge exercise (M5)
     ├── ai-research-notes.md         # Cited sources, established vs emerging (M5)

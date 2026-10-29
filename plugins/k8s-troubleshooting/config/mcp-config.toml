@@ -5,6 +5,8 @@ read_only = true
 cluster_provider_strategy = "kubeconfig"
 disable_destructive = true
 toolsets = ["core", "config"]
+# configuration_view returns kubeconfig contents; the skill forbids reading them.
+disabled_tools = ["configuration_view"]
 
 # Block Secret payloads; ConfigMaps stay readable.
 [[denied_resources]]
